@@ -28,9 +28,15 @@ body {
     margin-top: 10px;
 }
 
-.timer-game {background-color: #25B003; font-size: 10px;}
+.timer-game {
+    background-color: #25B003;
+    font-size: 10px;
+}
 
-.progress, .progress-stacked {background-color: #BEE8B4}
+.progress,
+.progress-stacked {
+    background-color: #BEE8B4
+}
 
 .seguridad-active {
     background-color: #C29FFA;
@@ -92,10 +98,11 @@ body {
 }
 
 .sortable-drag .sortable-item {
-    -webkit-transform: rotate(5deg);
-    -ms-transform: rotate(5deg);
-    transform: rotate(5deg);
-    top: 5px;
+    -webkit-transform: rotate(5deg) scale(1.05);
+    -ms-transform: rotate(5deg) scale(1.05);
+    transform: rotate(5deg) scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    cursor: grabbing !important;
 }
 
 /* Oculta el contenido real del espacio mientras se arrastra */
@@ -139,4 +146,114 @@ body {
 .sortable-item:active {
     cursor: -webkit-grabbing;
     cursor: grabbing;
+}
+
+.cw-swap-target .sortable-item {
+    outline: 2px solid #A370F7;
+    transform: scale(1.04);
+    transition: transform 120ms, outline-color 120ms;
+}
+
+.cw-dragging-source .sortable-item {
+    opacity: .55;
+    transition: opacity 120ms;
+}
+
+.cw-swap-flash .sortable-item {
+    box-shadow: 0 0 0 4px rgba(163, 112, 247, .25);
+    transition: box-shadow 180ms;
+}
+
+.cw-cancel .sortable-item {
+    animation: cwShake .22s ease-in-out;
+}
+
+@keyframes cwShake {
+    0% {
+        transform: translateX(0)
+    }
+
+    25% {
+        transform: translateX(-3px)
+    }
+
+    50% {
+        transform: translateX(3px)
+    }
+
+    75% {
+        transform: translateX(-2px)
+    }
+
+    100% {
+        transform: translateX(0)
+    }
+}
+
+.sortable-drag .sortable-item,
+.sortable-fallback .sortable-item,
+.cw-fallback .sortable-item {
+    transform: rotate(5deg) translateY(-2px);
+    transition: transform 120ms;
+}
+
+.sortable-fallback,
+.cw-fallback {
+    z-index: 9999;
+}
+
+/* Game notification floating in top-right */
+.game-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    background: white;
+    padding: 20px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    text-align: center;
+    display: none;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.game-notification.active {
+    display: block;
+}
+
+.game-notification #message {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.game-notification #replay {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #6610F2;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.game-notification #replay:hover {
+    background: #5209d4;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(102, 16, 242, 0.3);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }

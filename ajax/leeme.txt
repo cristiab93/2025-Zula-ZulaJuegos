@@ -1,0 +1,13 @@
+game-start.php: cuando abrís la página o tocás “Volver a jugar”, busca si ya existe una partida en tu sesión;
+ si la hay, la retoma tal cual (tablero, nivel y tiempo restante calculado en el servidor con la hora de inicio),
+  y si no, crea una nueva para el nivel pedido usando la config activa; así no podés “resetear” el reloj con F5.
+
+action.php: cada vez que arrastrás y soltás, le manda al servidor el swap; el backend aplica el cambio sobre su tablero
+ oficial, chequea si una fila quedó con 4 del mismo grupo (usa el mapa secreto), marca resueltos, 
+ asigna colores y devuelve el estado actualizado con tiempo restante; con “tick” solo sincroniza el tiempo; 
+ toda la validación vive en el server para que no se pueda trucar.
+
+game-over.php: cuando el juego termina (ganás o perdés), cierra la partida, calcula segundos jugados y puntos, 
+guarda el resultado en la base, limpia la sesión de esa partida y actualiza tu progreso: 
+si ganaste desbloquea el siguiente nivel y te lo deja listo, si perdiste quedás en el mismo para reintentar; 
+devuelve outcome, puntos y el próximo nivel.
