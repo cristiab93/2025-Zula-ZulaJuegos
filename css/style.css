@@ -140,3 +140,141 @@ body {
     cursor: -webkit-grabbing;
     cursor: grabbing;
 }
+
+/* ROSCO */
+.font13 {font-size: 13px; line-height: 16px;}
+.gray-600 {color: #6E7891}
+.bg-gray-200 {background-color: #E3E6ED;}
+.fw-600 {font-weight: 600;}
+.fit-content {width: fit-content;}
+.circle-wrapper {
+  width: 420px;
+  height: 420px;
+  position: relative;
+}
+
+.circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 1px solid #C29FFA;
+  color: #6610F2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  background: #fff;
+}
+
+.circle.active {
+  background: #C29FFA;
+  border-color: #8540F5;
+}
+
+.circle.success {
+  background: #90D67F;
+  border-color: #25B003;
+  color: #23890B;
+}
+
+.circle.error {
+  background: #F48270;
+  border-color: #FA3B1D;
+  color: #B81800;
+}
+.circle.circle-min {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+}
+/* centro */
+.center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 700;
+  color: #d1d5db;
+}
+
+/* posicion radial REAL */
+.item {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform-origin: center;
+}
+.btn-arrow {
+    background-color: #C29FFA;
+}
+.form-control::placeholder
+ {
+    color: #8A94AD; font-weight: 400; font-size: 14px
+}
+.btn-arrow:hover {
+    background-color: #6610F2;
+}
+/* radio = 170px */
+.a { transform: rotate(-90deg) translate(150px) rotate(90deg); }
+.b { transform: rotate(-45deg) translate(150px) rotate(45deg); }
+.c { transform: rotate(0deg) translate(150px) rotate(0deg); }
+.d { transform: rotate(45deg) translate(150px) rotate(-45deg); }
+.e { transform: rotate(90deg) translate(150px) rotate(-90deg); }
+.f { transform: rotate(135deg) translate(150px) rotate(-135deg); }
+.g { transform: rotate(180deg) translate(150px) rotate(-180deg); }
+.h { transform: rotate(225deg) translate(150px) rotate(-225deg); }
+
+.timer {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background-color: rgb(255, 255, 255);
+border-radius: 50%;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring circle {
+  fill: none;
+  stroke-width: 5;
+}
+
+.progress-ring__background {
+  stroke: #e6e6e6;
+}
+
+.progress-ring__circle {
+  stroke: #25B003;
+  stroke-linecap: round;
+  stroke-dasharray: 327;
+  stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.3s linear;
+
+}
+
+.timer-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon {
+  font-size: 20px;
+}
+
+.time {
+  font-size: 14px;
+    color: #141824;
+}
+
+
+/* VERDADERO O FALSO */
+.gray-700 {color: #525B75;}
+.btn-siguiente {background-color: #6610F2; color: #FFFFFF;}
+
+::selection {background-color: #000000; color: #FFFFFF;}
