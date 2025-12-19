@@ -631,10 +631,11 @@ function CrearEstructura() {
     const titleRow = document.createElement("div");
     titleRow.className = "row justify-content-center cw-title-row";
     titleRow.dataset.rowIndex = String(r);
-    titleRow.style.minHeight = "0";
-    titleRow.style.height = "0";
-    titleRow.style.marginBottom = "0";
+    titleRow.style.minHeight = "0px";
+    titleRow.style.height = "0px";
+    titleRow.style.marginBottom = "1rem";
     titleRow.style.overflow = "hidden";
+    titleRow.style.transition = "all 0.3s ease";
 
     const titleCol = document.createElement("div");
     titleCol.className = "col-auto";
@@ -687,8 +688,8 @@ function AplicarDecoracionFila(r) {
   if (key && style) {
     fila.classList.add(style.rowClass);
     if (titleRow) {
-      titleRow.style.minHeight = "55px";
-      titleRow.style.height = "55px";
+      titleRow.style.minHeight = "35px";
+      titleRow.style.height = "auto";
       titleRow.style.marginBottom = "0.25rem";
     }
     title.style.display = "inline-block";
@@ -704,9 +705,9 @@ function AplicarDecoracionFila(r) {
     });
   } else {
     if (titleRow) {
-      titleRow.style.minHeight = "0";
-      titleRow.style.height = "0";
-      titleRow.style.marginBottom = "0";
+      titleRow.style.minHeight = "0px";
+      titleRow.style.height = "0px";
+      titleRow.style.marginBottom = "1rem";
     }
     title.style.display = "none";
     title.textContent = "";
