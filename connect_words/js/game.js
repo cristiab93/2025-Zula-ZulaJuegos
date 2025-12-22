@@ -8,8 +8,12 @@ const estado = {
   juegoTerminado: false,
   envioGameOver: false,
   tiempoRestante: 60,
+  initialDuration: 60,
   intervalo: null,
   syncIntervalo: null,
+  animationFrameId: null,
+  timerStartTime: null,
+  timerInitialTimeLeft: null,
   cols: null,
   rows: null,
   sortables: [],
@@ -317,6 +321,10 @@ function DetenerTimer() {
     clearInterval(estado.intervalo);
     estado.intervalo = null;
   }
+  if (estado.animationFrameId) {
+    cancelAnimationFrame(estado.animationFrameId);
+    estado.animationFrameId = null;
+  }
 }
 
 function DetenerSync() {
@@ -327,18 +335,39 @@ function DetenerSync() {
 }
 
 function ActualizarTiempo() {
-  tiempoEl.textContent = FormatearTiempo(estado.tiempoRestante);
+  const displayTime = Math.ceil(estado.tiempoRestante);
+  tiempoEl.textContent = FormatearTiempo(displayTime);
+
+  const circle = document.querySelector(".progress-ring__circle");
+  if (circle) {
+    const radius = 42;
+    const circumference = 2 * Math.PI * radius;
+    circle.style.strokeDasharray = circumference;
+
+    const totalDuration = estado.initialDuration || 60;
+    const elapsed = totalDuration - estado.tiempoRestante;
+    const offset = (elapsed / totalDuration) * circumference;
+    circle.style.strokeDashoffset = offset;
+  }
 }
 
 function IniciarTimer() {
   DetenerTimer();
-  estado.intervalo = setInterval(() => {
-    if (estado.juegoTerminado) {
-      DetenerTimer();
-      return;
-    }
-    estado.tiempoRestante -= 1;
-    if (estado.tiempoRestante <= 0) {
+
+  if (!estado.initialDuration) estado.initialDuration = estado.tiempoRestante;
+  estado.timerStartTime = performance.now();
+  estado.timerInitialTimeLeft = estado.tiempoRestante;
+
+  function animate(timestamp) {
+    if (estado.juegoTerminado) return;
+
+    const elapsedMs = timestamp - estado.timerStartTime;
+    const newTiempoRestante = Math.max(0, estado.timerInitialTimeLeft - elapsedMs / 1000);
+
+    estado.tiempoRestante = newTiempoRestante;
+    ActualizarTiempo();
+
+    if (newTiempoRestante <= 0) {
       estado.tiempoRestante = 0;
       ActualizarTiempo();
       estado.juegoTerminado = true;
@@ -349,8 +378,11 @@ function IniciarTimer() {
       Renderizar();
       return;
     }
-    ActualizarTiempo();
-  }, 1000);
+
+    estado.animationFrameId = requestAnimationFrame(animate);
+  }
+
+  estado.animationFrameId = requestAnimationFrame(animate);
 }
 
 function IniciarSync() {
@@ -940,6 +972,8 @@ function AplicarRespuesta(resp) {
 
   if (typeof resp.time_left === "number") {
     estado.tiempoRestante = resp.time_left;
+    estado.timerStartTime = performance.now();
+    estado.timerInitialTimeLeft = estado.tiempoRestante;
     ActualizarTiempo();
   }
 
@@ -1037,6 +1071,7 @@ function IniciarJuego() {
       dbg("GAME_ALREADY_FINISHED_ON_LOAD", { status: parsed.status }, "warn");
       FinalizarJuego(parsed);
     } else {
+      estado.initialDuration = parsed.duration || estado.tiempoRestante || 60;
       IniciarTimer();
       IniciarSync();
     }

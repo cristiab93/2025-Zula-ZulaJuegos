@@ -53,7 +53,8 @@ $timeLeft = TiempoRestante($s);
 $elapsed = (int)$s["duration"] - $timeLeft;
 if ($elapsed < 0) $elapsed = 0;
 
-$status = (count($s["solved_groups"]) === 4) ? "won" : (($timeLeft <= 0) ? "lost" : "lost");
+$expectedGroups = isset($s["cols"]) ? (int)$s["cols"] : 4;
+$status = (count($s["solved_groups"]) === $expectedGroups) ? "won" : "lost";
 $s["ended"] = 1;
 
 $points = count($s["solved_groups"]) * 25;
