@@ -23,8 +23,29 @@ include_once "_general.php";
   
   <div class="container vh-100 position-relative">
     <div class="row align-items-center justify-content-center vh-100">
+  
       <div class="col-xl-10 text-center">
-        <p class="timer-game d-inline-block px-2 py-1 rounded-1 mb-4" id="time">01:00</p>
+         <div class="timer ms-auto">
+        <svg class="progress-ring" width="100" height="100">
+          <circle
+            class="progress-ring__background"
+            cx="50"
+            cy="50"
+            r="42"
+          />
+          <circle
+            class="progress-ring__circle"
+            cx="50"
+            cy="50"
+            r="42"
+          />
+        </svg>
+
+        <div class="timer-content">
+          <span><img src="img/clock.gif" height="25"></span>
+          <span class="time" id="time">01:00</span>
+        </div>
+      </div>   
         <div id="board"></div>
       </div>
     </div>
