@@ -14,25 +14,60 @@ include_once "_general.php";
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/style.css?v=<?php echo filemtime('css/style.css'); ?>" rel="stylesheet">
 </head>
-<body class="bg-lines">
-  <!-- Floating game status notification -->
-  <div id="game-notification" class="game-notification">
-    <p id="message"></p>
-    <button id="replay" style="display:none;">Jugar de nuevo</button>
-  </div>
-  
-  <div class="container vh-100 position-relative">
-    <div class="row align-items-center justify-content-center vh-100">
-      <div class="col-xl-10 text-center">
-        <p class="timer-game d-inline-block px-2 py-1 rounded-1 mb-4" id="time">01:00</p>
-        <div id="board"></div>
-      </div>
-    </div>
-  </div>
+<body class="bg-white">
 
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="js/bootstrap.bundle.min.js"></script>
-  <script src="js/Sortable.min.js"></script>
-  <script src="js/game.js?v=<?php echo filemtime('js/game.js'); ?>"></script>
+<div class="container h-100">
+<div class="row h-100 align-items-center justify-content-center">
+<div class="col-11">
+<div class="bg-title text-center py-5 rounded-4">
+<p class="mb-0 text-black">Estas listo para jugar al </p>  
+<h1 class="mb-0 fw-700 text-black">Connect Word</h1>
+</div>
+
+<div class="row justify-content-center cards-ob">
+<div class="col-12 col-md-4 col-xl-3 mt-4">
+<div class="card rounded-4">
+  <div class="card-body p-4">
+<div class="bg-green-100 fit-content p-2 rounded-3 mb-3">
+<img src="img/icon1.svg">  
+</div>
+ <p class="mb-0 text-black">Cuanto antes termines, <br> más puntos sumás</p> 
+ </div>
+ </div>
+</div>
+
+<div class="col-12 col-md-4 col-xl-3 mt-4">
+<div class="card rounded-4">
+  <div class="card-body p-4">
+<div class="bg-blue-100 fit-content p-2 rounded-3 mb-3">
+<img src="img/icon2.svg">  
+</div>
+ <p class="mb-0 text-black fw-600">Arrastrá y agrupá tres fichas de palabras colocándolas en una fila</p> 
+ </div>
+ </div>
+</div>
+
+<div class="col-12 col-md-4 col-xl-3 mt-4">
+<div class="card rounded-4">
+  <div class="card-body p-4">
+<div class="bg-red-100 fit-content p-2 rounded-3 mb-3">
+<img src="img/icon3.svg">  
+</div>
+ <p class="mb-0 text-black">Tenés 30 segundos para adivinar</p> 
+ </div>
+ </div>
+</div>
+</div>
+<hr class="mt-4">
+
+<div class="col-12 text-center mt-4">
+<div class="btn fw-700 btn-primary px-4 py-3">Empezar juego <img src="img/arrow.svg" class="ms-2"> </div>  
+</div>
+</div>
+
+</div>
+
+</div>
+
 </body>
 </html>

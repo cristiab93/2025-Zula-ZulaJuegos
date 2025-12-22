@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zula</title>
+  <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body class="bg-lines">
+  <!--<div class="logo position-absolute top-50 start-50 translate-middle">
+        <img src="img/logo.svg">
+    </div>-->
+  <div class="container vh-100 position-relative">
+    <div class="row align-items-center justify-content-center vh-100">
+      <div class="col-xl-10 text-center">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-start">
+            <div class="bg-gray-200 fit-content px-2 py-1 rounded-2">
+              <img src="img/alert.svg" height="17">
+            </div>
+            <p class="gray-600 mb-0 font13 mt-2">Leé la afirmación <br>
+              y decí si es correcta</p>
+          </div>
+
+
+
+          <div class="timer">
+            <svg class="progress-ring" width="100" height="100">
+              <circle class="progress-ring__background" cx="50" cy="50" r="42" />
+              <circle class="progress-ring__circle" cx="50" cy="50" r="42" />
+            </svg>
+
+            <div class="timer-content">
+              <span class="icon">⌛</span>
+              <span class="time" id="time">01:00</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="row align-items-center justify-content-center">
+          <div class="col-12 col-md-6 text-start">
+
+           <h3 class="text-black fw-600 mt-3">El CBU identifica de forma única una cuenta bancaria en Argentina.</h3>
+           <p class="gray-700">El CBU es el identificador único de 
+cuentas en el sistema argentino.</p>
+            <div class="btn-siguiente fw-600 mt-4 fit-content px-4 rounded-2 py-2">SIGUIENTE</div>
+
+
+          </div>
+
+          <div class="col-12 col-md-6 text-start">
+          
+          </div>
+        </div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Scripts: bootstrap + Sortable (igual que tenías) -->
+  <script src="js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const circle = document.querySelector(".progress-ring__circle");
+    const timeText = document.getElementById("time");
+
+    const radius = 42; // 👈 coincide con el SVG
+    const circumference = 2 * Math.PI * radius;
+
+    circle.style.strokeDasharray = circumference;
+    circle.style.strokeDashoffset = 0;
+
+    let totalTime = 60;
+    let elapsed = 0;
+
+    function formatTime(seconds) {
+      const m = String(Math.floor(seconds / 60)).padStart(2, "0");
+      const s = String(seconds % 60).padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function setProgress(elapsed) {
+      const offset = (elapsed / totalTime) * circumference;
+      circle.style.strokeDashoffset = offset;
+    }
+
+    timeText.textContent = formatTime(totalTime);
+
+    let start = null;
+
+    function animate(timestamp) {
+      if (!start) start = timestamp;
+
+      const elapsedMs = timestamp - start;
+      const elapsedSeconds = Math.min(elapsedMs / 1000, totalTime);
+
+      setProgress(elapsedSeconds);
+      timeText.textContent = formatTime(Math.ceil(totalTime - elapsedSeconds));
+
+      if (elapsedSeconds < totalTime) {
+        requestAnimationFrame(animate);
+      }
+    }
+
+    requestAnimationFrame(animate);
+
+  </script>
+
+
+
+
+
+
+</body>
+
+</html>
