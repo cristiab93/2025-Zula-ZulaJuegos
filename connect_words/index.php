@@ -61,7 +61,7 @@ include_once "_general.php";
 <hr class="mt-4">
 
 <div class="col-12 text-center mt-4">
-<div class="btn fw-700 btn-primary px-4 py-3">Empezar juego <img src="img/arrow.svg" class="ms-2"> </div>  
+<a href="game.php" class="btn fw-700 btn-primary px-4 py-3">Empezar juego <img src="img/arrow.svg" class="ms-2"> </a>  
 </div>
 </div>
 
