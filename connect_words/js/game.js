@@ -349,6 +349,19 @@ function ActualizarTiempo() {
     const offset = (elapsed / totalDuration) * circumference;
     circle.style.strokeDashoffset = offset;
   }
+
+  const clockIcon = document.getElementById("clock-icon");
+  if (clockIcon) {
+    if (estado.juegoTerminado) {
+      clockIcon.style.display = "none";
+      clockIcon.style.visibility = "hidden";
+      clockIcon.style.opacity = "0";
+    } else {
+      clockIcon.style.display = "inline";
+      clockIcon.style.visibility = "visible";
+      clockIcon.style.opacity = "1";
+    }
+  }
 }
 
 function IniciarTimer() {
@@ -424,7 +437,8 @@ function ResetEstado() {
   estado.lastPlayerAction = null;
   mensajeEl.textContent = "";
   replayEl.style.display = "none";
-  replayEl.onclick = null;
+  const clockIcon = document.getElementById("clock-icon");
+  if (clockIcon) clockIcon.style.display = "inline";
   boardEl.innerHTML = "";
 }
 
@@ -1005,6 +1019,13 @@ function FinalizarJuego() {
   ShowNotification();
   replayEl.style.display = "inline-block";
   replayEl.onclick = () => IniciarJuego();
+
+  const clockIcon = document.getElementById("clock-icon");
+  if (clockIcon) {
+    clockIcon.style.display = "none";
+    clockIcon.style.visibility = "hidden";
+    clockIcon.style.opacity = "0";
+  }
 
   if (estado.envioGameOver || !estado.gid) return;
 

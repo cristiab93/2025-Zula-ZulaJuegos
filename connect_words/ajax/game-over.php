@@ -1,13 +1,26 @@
 <?php
+/* =========================
+   PARTE 1: DB / Conexión / Queries
+   ========================= */
 include "../_general.php";
-if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 header("Content-Type: application/json; charset=utf-8");
 
-function Responder($a)
+function GuardarResultado($s, $gid, $outcome, $finishSecond, $points)
 {
-  echo json_encode($a, JSON_UNESCAPED_UNICODE);
-  exit;
+  $ins = InsertQuery("player_results");
+  $ins->Value("res_game_config_id", "i", (int)$s["cfg_id"]);
+  $ins->Value("res_player_id", "i", 0);
+  $ins->Value("res_game_id", "s", $gid);
+  $ins->Value("res_outcome", "s", $outcome);
+  $ins->Value("res_points", "i", $points);
+  $ins->Value("res_finish_second", "i", $finishSecond);
+  return $ins->Run();
 }
+
+/* =========================
+   PARTE 2: Lógica del endpoint (PHP puro)
+   ========================= */
+$resp = null;
 
 function TiempoRestante($s)
 {
@@ -30,21 +43,10 @@ function ValidarGid()
   return $gid;
 }
 
-function GuardarResultado($s, $gid, $outcome, $finishSecond, $points)
-{
-  $ins = InsertQuery("player_results");
-  $ins->Value("res_game_config_id", "i", (int)$s["cfg_id"]);
-  $ins->Value("res_player_id", "i", 0);
-  $ins->Value("res_game_id", "s", $gid);
-  $ins->Value("res_outcome", "s", $outcome);
-  $ins->Value("res_points", "i", $points);
-  $ins->Value("res_finish_second", "i", $finishSecond);
-  return $ins->Run();
-}
-
 $gid = ValidarGid();
 if (!$gid) {
-  Responder(["success" => 0, "error" => "BAD_GID"]);
+  $resp = ["success" => 0, "error" => "BAD_GID"];
+  goto RESPOND;
 }
 
 $s =& $_SESSION["connect_words"][$gid];
@@ -61,9 +63,16 @@ $points = count($s["solved_groups"]) * 25;
 
 GuardarResultado($s, $gid, $status, $elapsed, $points);
 
-Responder([
+$resp = [
   "success" => 1,
   "status" => $status,
   "points" => $points,
   "finish_second" => $elapsed
-]);
+];
+
+/* =========================
+   PARTE 3: Respuesta JSON
+   ========================= */
+RESPOND:
+echo json_encode($resp, JSON_UNESCAPED_UNICODE);
+exit;

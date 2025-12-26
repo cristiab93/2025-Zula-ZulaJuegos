@@ -1,13 +1,14 @@
 <?php
+/* =========================
+   PARTE 1: DB / Conexión / Queries
+   ========================= */
 include "../_general.php";
-if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 header("Content-Type: application/json; charset=utf-8");
 
-function Responder($a)
-{
-  echo json_encode($a, JSON_UNESCAPED_UNICODE);
-  exit;
-}
+/* =========================
+   PARTE 2: Lógica del endpoint (PHP puro)
+   ========================= */
+$resp = null;
 
 function ObtenerParam($k, $d = "")
 {
@@ -53,7 +54,7 @@ function ResolverFilas(&$s)
 {
   $gm = $s["group_map"];
   $nuevos = [];
-  
+
   $cols = isset($s["cols"]) ? (int)$s["cols"] : 4;
   $rows = isset($s["rows"]) ? (int)$s["rows"] : 4;
 
@@ -70,11 +71,13 @@ function ResolverFilas(&$s)
       $gx = isset($gm[$ids[$i]]) ? $gm[$ids[$i]] : "";
       if ($gx !== $g0) { $ok = false; break; }
     }
+
     if ($ok && !in_array($g0, $s["solved_groups"], true)) {
       $s["solved_groups"][] = $g0;
       foreach ($ids as $tid) $nuevos[] = $tid;
     }
   }
+
   return $nuevos;
 }
 
@@ -103,7 +106,8 @@ function AplicarSwap(&$s, $from, $to)
 
 $gid = ValidarGid();
 if (!$gid) {
-  Responder(["success" => 0, "error" => "BAD_GID"]);
+  $resp = ["success" => 0, "error" => "BAD_GID"];
+  goto RESPOND;
 }
 
 $s =& $_SESSION["connect_words"][$gid];
@@ -112,7 +116,7 @@ $op = ObtenerParam("op", "");
 $tl = TiempoRestante($s);
 if ((int)$s["ended"] === 1 || $tl <= 0) {
   $s["ended"] = 1;
-  Responder([
+  $resp = [
     "success" => 1,
     "status" => "lost",
     "message" => "Perdiste",
@@ -120,11 +124,12 @@ if ((int)$s["ended"] === 1 || $tl <= 0) {
     "board" => $s["board"],
     "tiles_solved" => TilesResueltas($s),
     "new_solved_ids" => []
-  ]);
+  ];
+  goto RESPOND;
 }
 
 if ($op === "tick") {
-  Responder([
+  $resp = [
     "success" => 1,
     "status" => "playing",
     "message" => "",
@@ -132,27 +137,28 @@ if ($op === "tick") {
     "board" => $s["board"],
     "tiles_solved" => TilesResueltas($s),
     "new_solved_ids" => []
-  ]);
+  ];
+  goto RESPOND;
 }
 
 if ($op === "swap") {
   $from = (int)ObtenerParam("from", "-1");
   $to = (int)ObtenerParam("to", "-1");
-  
+
   $cols = isset($s["cols"]) ? (int)$s["cols"] : 4;
   $rows = isset($s["rows"]) ? (int)$s["rows"] : 4;
   $maxIndex = ($cols * $rows) - 1;
-  
+
   if ($from < 0 || $from > $maxIndex || $to < 0 || $to > $maxIndex) {
-    Responder(["success" => 0, "error" => "BAD_INDEX"]);
+    $resp = ["success" => 0, "error" => "BAD_INDEX"];
+    goto RESPOND;
   }
 
   $nuevos = AplicarSwap($s, $from, $to);
   $status = "playing";
   $message = "";
-  
-  $cols = isset($s["cols"]) ? (int)$s["cols"] : 4;
-  $expectedGroups = $cols; // For a square grid, number of groups = cols
+
+  $expectedGroups = $cols;
 
   if (count($s["solved_groups"]) === $expectedGroups) {
     $s["ended"] = 1;
@@ -162,7 +168,7 @@ if ($op === "swap") {
     $message = "Bien!";
   }
 
-  Responder([
+  $resp = [
     "success" => 1,
     "status" => $status,
     "message" => $message,
@@ -170,7 +176,15 @@ if ($op === "swap") {
     "board" => $s["board"],
     "tiles_solved" => TilesResueltas($s),
     "new_solved_ids" => $nuevos
-  ]);
+  ];
+  goto RESPOND;
 }
 
-Responder(["success" => 0, "error" => "BAD_OP"]);
+$resp = ["success" => 0, "error" => "BAD_OP"];
+
+/* =========================
+   PARTE 3: Respuesta JSON
+   ========================= */
+RESPOND:
+echo json_encode($resp, JSON_UNESCAPED_UNICODE);
+exit;
