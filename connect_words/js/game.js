@@ -944,10 +944,14 @@ function EnviarAccion(op, payload, silent) {
   }
 
   const data = Object.assign({ gid: estado.gid, op }, payload || {});
+
+   console.log("[CW] action.php payload =>", data);
   if (!silent) dbg("API_SEND", data);
 
   $.post("ajax/action.php", data, resp => {
     let parsed = resp;
+
+    console.log(resp);
     if (typeof parsed === "string") {
       try { parsed = JSON.parse(parsed); } catch (e) { parsed = {}; }
     }
@@ -1048,6 +1052,8 @@ function IniciarJuego() {
     if (typeof parsed === "string") {
       try { parsed = JSON.parse(parsed); } catch (e) { parsed = {}; }
     }
+    
+    console.log (parsed);
 
     if (!parsed || !parsed.success) {
       mensajeEl.textContent = (parsed && parsed.error) ? parsed.error : "No hay configuración activa";
