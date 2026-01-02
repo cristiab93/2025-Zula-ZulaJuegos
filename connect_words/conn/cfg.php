@@ -11,10 +11,10 @@ if($_SERVER['HTTP_HOST'] == 'localhost:82' || $_SERVER['HTTP_HOST'] == 'localhos
 }
 else
 {
-    /*define("DBSERVERNAME", "localhost");
-	define("DBUSERNAME", "c2110196_sk");
-	define("DBPASSWORD", "poGEve59wi");
-	define("DBNAME", "c2110196_sk");
+    define("DBSERVERNAME", "localhost");
+	define("DBUSERNAME", "a0050875_testing");
+	define("DBPASSWORD", "luriPUgi41");
+	define("DBNAME", "a0050875_testing");
 	define("DEPURAR", 0);
-	define("BASEURL", "https://somoskahlo.com");*/
+	define("BASEURL", "https://a0050875.ferozo.com/");
 }
