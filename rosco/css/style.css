@@ -11,6 +11,13 @@ body {
 .bg-green-100 {background-color: #D9FBD0;}
 .bg-blue-100 {background-color: #E5EDFF;}
 .bg-red-100 {background-color: #FFE0DB;}
+.wh-45
+ {
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    line-height: 45px;
+}
 /* CONNECT WORDS */
 .bg-lines {
     background-color: #ffffff;
