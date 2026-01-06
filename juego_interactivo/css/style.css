@@ -13,22 +13,45 @@ p {
     font-size: 13px;
 }
 
+.steps-slider {
+    padding: 15px 0;
+}
+
 .steps-slider .slick-track {
     display: flex;
     gap: 15px;
     /* 👈 tu gap real */
+    align-items: center;
 }
-.background-img
- {
+
+.steps-slider .slick-list {
+    overflow: visible;
+}
+
+.background-img {
     min-height: 370px;
     background-repeat: no-repeat;
     background-size: cover;
 }
+
+.form-check {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.form-check:hover {
+    background-color: #ECE3FA;
+    border-color: #8540F5;
+    color: #6610F2;
+    font-weight: 500;
+}
+
 .form-check.active {
     border-color: #6610F2;
     background-color: #6610F2;
     color: #FFFFFF;
 }
+
 .step-card {
     width: 135px;
     height: 90px;
@@ -41,12 +64,15 @@ p {
     justify-content: center;
     background-color: #EFF2F6;
     border: 2px solid #CBD0DD;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
 }
 
 .step-card p {
     font-size: 11px;
     margin-bottom: 0;
     color: #8A94AD;
+    transition: color 0.3s ease;
 }
 
 .icon-circle {
@@ -58,13 +84,32 @@ p {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.icon-circle img {
+    animation: iconPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes iconPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 /* Activa */
 .step-card.active {
-    border: 2px solid #8540F5;
+    border: 3px solid #8540F5;
     background: #ECE3FA;
-    font-weight: 600;
+    font-weight: 700;
+    box-shadow: 0 6px 18px rgba(133, 64, 245, 0.25);
+    z-index: 2;
 }
 
 .step-card.success {
@@ -86,16 +131,31 @@ p {
 
 .btn-primary {
     background-color: #3874FF;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
 }
 
 .btn-primary-outline {
     border: 2px solid #3874FF;
     color: #3874FF;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-primary-outline img {
+    transition: filter 0.3s ease;
 }
 
 .btn-primary-outline:hover {
     background-color: #3874FF;
     color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.btn-primary-outline:hover img {
+    filter: brightness(0) invert(1);
 }
 
 /* CONNECT WORDS */
@@ -135,7 +195,9 @@ p {
     color: #B81800;
 }
 
-.text-green-700 {color: #1C6C09;}
+.text-green-700 {
+    color: #1C6C09;
+}
 
 .text-grey-500 {
     color: #8A94AD
@@ -154,7 +216,8 @@ p {
 }
 
 .font10 {
-    font-size: 10px;
+    font-size: 11px;
+    padding: 3px 8px;
 }
 
 h3 {
@@ -170,7 +233,9 @@ h2 {
     font-size: 20px;
 }
 
-.font18 {font-size: 18px;}
+.font18 {
+    font-size: 18px;
+}
 
 .bg-title {
     background-image: url("../img/bg-title.jpg");
@@ -249,20 +314,7 @@ h2 {
     color: #D6630A;
 }
 
-.steps-slider::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 80px;
-    /* ancho del fade */
-    height: 100%;
-    pointer-events: none;
-    background: linear-gradient(to right,
-            rgba(255, 255, 255, 0),
-            rgba(255, 255, 255, 1));
-}
-
+/* Slider fade removed for clarity */
 .bg-violeta {
     background-color: #6610F2;
 }
@@ -446,5 +498,65 @@ h2 {
 
     .cards-ob .card p {
         font-size: 15px;
+    }
+}
+
+/* ERROR FLASH ANIMATION */
+@keyframes errorFlash {
+    0% {
+        background-color: #FFFFFF;
+        border-color: #dee2e6;
+    }
+
+    20% {
+        background-color: #FFE0DB;
+        border-color: #B81800;
+        transform: translateX(-5px);
+    }
+
+    40% {
+        transform: translateX(5px);
+    }
+
+    60% {
+        transform: translateX(-5px);
+    }
+
+    80% {
+        transform: translateX(5px);
+    }
+
+    100% {
+        background-color: #FFFFFF;
+        border-color: #dee2e6;
+        transform: translateX(0);
+    }
+}
+
+.form-check.error-flash {
+    animation: errorFlash 0.5s ease-in-out;
+    color: #B81800 !important;
+}
+
+/* SCREEN TRANSITIONS */
+.trivia-screen {
+    min-height: 380px;
+    align-items: center;
+    justify-content: center;
+}
+
+.trivia-screen.animate-in {
+    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

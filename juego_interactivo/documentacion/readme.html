@@ -1,0 +1,1216 @@
+<!doctype html>
+<html lang="es-AR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Juego Interactivo (Trivia) — Documentación (API + DB)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="#top">Juego Interactivo (Trivia) — Documentación</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav"
+        aria-controls="topNav" aria-expanded="false" aria-label="Abrir navegación">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="topNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#overview">Overview</a></li>
+          <li class="nav-item"><a class="nav-link" href="#security">Sanitización</a></li>
+          <li class="nav-item"><a class="nav-link" href="#db">DB</a></li>
+          <li class="nav-item"><a class="nav-link" href="#cfg-content">cfg_content</a></li>
+          <li class="nav-item"><a class="nav-link" href="#session-model">Sesión</a></li>
+          <li class="nav-item"><a class="nav-link" href="#game-start">game-start</a></li>
+          <li class="nav-item"><a class="nav-link" href="#action">action</a></li>
+          <li class="nav-item"><a class="nav-link" href="#game-over">game-over</a></li>
+          <li class="nav-item"><a class="nav-link" href="#flow">Flujo FE</a></li>
+          <li class="nav-item"><a class="nav-link" href="#edge-cases">Casos borde</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4" id="top">
+    <div class="row g-4">
+
+      <div class="col-12" id="overview">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h1 class="h3 mb-2">Juego Interactivo (Trivia) — Endpoints + DB + Contrato JSON</h1>
+            <p class="text-secondary mb-0">
+              Documentación completa de:
+              <span class="fw-semibold">inputs/outputs</span> de cada endpoint,
+              reglas exactas del backend,
+              relación con el front-end (<code>game.js</code>),
+              y detalle del <code>cfg_content</code> (JSON) que define la experiencia por “pasos”
+              (<code>instances</code>).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" id="security">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Sanitización, validación y garantías del contrato</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">Entrada (INPUT) — validación y sanitización (backend)</div>
+                    <ul class="mb-0">
+                      <li><span class="fw-semibold">Trim:</span> params desde <code>$_POST</code> pasan por
+                        <code>trim()</code> en <code>ObtenerParam()</code>.
+                      </li>
+                      <li><span class="fw-semibold">cfg_key:</span> <code>ORDER BY RAND() LIMIT 1</code> para
+                        rendimiento.</li>
+                      <li><span class="fw-semibold">GID:</span> <code>random_bytes(16)</code> (32 chars hex). Mucho más
+                        seguro que <code>uniqid()</code>.</li>
+                      <li><span class="fw-semibold">Double Answer:</span> bloquea si se intenta responder el mismo
+                        índice dos veces (<code>QUESTION_ALREADY_ANSWERED</code>).</li>
+                      <li><span class="fw-semibold">index/selected:</span> casteos a <code>int</code>.</li>
+                      <li><span class="fw-semibold">ended:</span> si la partida finalizó, no permite acciones
+                        (<code>GAME_ALREADY_ENDED</code>).</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">Salida (OUTPUT) — qué se garantiza (backend)</div>
+                    <ul class="mb-0">
+                      <li>Respuestas en JSON con <code>json_encode(..., JSON_UNESCAPED_UNICODE)</code>.</li>
+                      <li><code>gid</code> es random hex robusto de 32 caracteres.</li>
+                      <li><code>duration</code>: informativa, el juego no tiene límite de tiempo real
+                        (<code>action.php</code> no bloquea por timeout).</li>
+                      <li><code>Limpieza:</code> BE filtra <code>correct</code> y <code>explanation</code> antes de
+                        enviarlas al FE en el start.</li>
+                      <li>Los <code>points</code> finales se calculan 100% en el servidor (no confía en el FE).</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="alert alert-warning mb-0" role="alert">
+                  <div class="fw-semibold mb-1">Nota importante de seguridad (FRONT-END): hoy hay HTML en cfg_content
+                  </div>
+                  En tu <code>game.js</code> se renderiza <code>inst.text</code> con <code>innerHTML</code> en varias
+                  pantallas
+                  (<code>text_image</code>, <code>image_text</code>, <code>text_video</code>, <code>only_text</code>,
+                  <code>intro_trivia</code>).
+                  Eso está buenísimo para formato, pero implica que el contenido de DB tiene que estar <span
+                    class="fw-semibold">controlado/sanitizado</span>.
+                  Si alguien mete HTML malicioso en <code>cfg_content</code> (o llega por un admin), podés tener XSS.
+                  Si querés máxima seguridad: usar <code>textContent</code> o sanitizar HTML (allowlist) antes de
+                  guardar en DB o antes de inyectar.
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="alert alert-secondary mb-0" role="alert">
+                  <div class="fw-semibold mb-1">Otra nota (options y labels)</div>
+                  Las <code>options</code> de una pregunta se insertan con <code>innerHTML</code> dentro del template
+                  del <code>label</code>.
+                  Si las opciones vinieran con HTML, también podrían inyectar markup. Ideal: tratar <code>options</code>
+                  como texto plano.
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" id="db">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Base de datos — tablas involucradas</h2>
+          </div>
+          <div class="card-body">
+            <p class="text-secondary mb-3">
+              El juego se alimenta desde <code>game_configs</code> y guarda resultados en <code>player_results</code>.
+              El campo clave es <code>cfg_content</code> (JSON con <code>instances</code>).
+            </p>
+
+            <h3 class="h6 mb-2">Tabla <code>game_configs</code> (origen del contenido)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Campo</th>
+                    <th>Tipo (orientativo)</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con Backend</th>
+                    <th>Relación con Front-end</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>cfg_id</code></td>
+                    <td><code>INT</code></td>
+                    <td>ID de la config.</td>
+                    <td>Trazabilidad de qué experiencia se usó.</td>
+                    <td>Se guarda en sesión (<code>cfg_id</code>) y se persiste en
+                      <code>player_results.res_game_config_id</code>.
+                    </td>
+                    <td>No se usa directo.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_key</code></td>
+                    <td><code>VARCHAR</code></td>
+                    <td>Familia de configs (ej: <code>juego_interactivo</code>).</td>
+                    <td>Agrupar configs por experiencia.</td>
+                    <td><code>game-start.php</code> filtra por <code>cfg_key</code> y <code>cfg_active</code>.</td>
+                    <td>FE manda <code>cfg_key</code> al iniciar.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_level</code></td>
+                    <td><code>INT</code></td>
+                    <td>Nivel/dificultad.</td>
+                    <td>Segmentación futura.</td>
+                    <td>Hoy no influye (se elige random entre activas).</td>
+                    <td>No se usa directo.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_active</code></td>
+                    <td><code>TINYINT(1)</code></td>
+                    <td>Flag activa (1) / inactiva (0).</td>
+                    <td>Habilitar/deshabilitar sin borrar.</td>
+                    <td>Si no hay activas: <code>NO_CONFIGS</code>.</td>
+                    <td>FE muestra error si <code>success=0</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_duration</code></td>
+                    <td><code>INT</code></td>
+                    <td>Duración total (seg).</td>
+                    <td>Tiempo de referencia de la actividad.</td>
+                    <td>Se guarda en sesión y se usa para calcular <code>finish_second</code> (y clamp de
+                      <code>time_left</code>).
+                    </td>
+                    <td>Hoy FE no muestra timer, pero podría hacerlo con <code>duration</code> (si se decide exponerlo).
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_content</code></td>
+                    <td><code>TEXT / JSON</code></td>
+                    <td>JSON con <code>instances</code>.</td>
+                    <td>Define el flujo completo: pantallas, preguntas, resultados.</td>
+                    <td>Se parsea, se guarda en sesión y se devuelve al FE (con limpieza de preguntas).</td>
+                    <td>FE renderiza pantallas por <code>type</code> y usa <code>step_title</code> para el slider.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_created</code></td>
+                    <td><code>DATETIME</code></td>
+                    <td>Fecha de creación.</td>
+                    <td>Auditoría.</td>
+                    <td><code>game-start.php</code> no usa orden fijo, usa <code>ORDER BY RAND()</code>.</td>
+                    <td>No se usa directo.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <hr class="my-4">
+
+            <h3 class="h6 mb-2">Tabla <code>player_results</code> (persistencia del resultado)</h3>
+            <p class="text-secondary mb-3">
+              Se inserta desde <code>ajax/game-over.php</code> con <code>InsertQuery("player_results")</code>.
+            </p>
+
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Campo</th>
+                    <th>Tipo (orientativo)</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con Backend</th>
+                    <th>Relación con Front-end</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>res_game_config_id</code></td>
+                    <td><code>INT</code></td>
+                    <td>ID config usada.</td>
+                    <td>Trazabilidad.</td>
+                    <td>Sale de <code>s["cfg_id"]</code>.</td>
+                    <td>No se usa directo.</td>
+                  </tr>
+                  <tr>
+                    <td><code>res_player_id</code></td>
+                    <td><code>INT</code></td>
+                    <td>ID jugador.</td>
+                    <td>Asociar usuario.</td>
+                    <td>Hoy va <code>0</code> fijo.</td>
+                    <td>No se usa directo.</td>
+                  </tr>
+                  <tr>
+                    <td><code>res_game_id</code></td>
+                    <td><code>VARCHAR</code></td>
+                    <td>GID (partida).</td>
+                    <td>Identificador único del run.</td>
+                    <td>Se llena con <code>$gid</code>.</td>
+                    <td>FE lo manda a <code>action</code> y <code>game-over</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>res_outcome</code></td>
+                    <td><code>VARCHAR</code></td>
+                    <td>Resultado final.</td>
+                    <td>Analítica/reporting.</td>
+                    <td>Hoy es <code>"finished"</code> fijo.</td>
+                    <td>FE no depende.</td>
+                  </tr>
+                  <tr>
+                    <td><code>res_points</code></td>
+                    <td><code>INT</code></td>
+                    <td>Puntaje final.</td>
+                    <td>Ranking/estadística.</td>
+                    <td>Se suma desde <code>user_answers[*].points</code> en sesión.</td>
+                    <td>FE lo calcula para UI, pero el backend no confía en eso.</td>
+                  </tr>
+                  <tr>
+                    <td><code>res_finish_second</code></td>
+                    <td><code>INT</code></td>
+                    <td>Segundos transcurridos.</td>
+                    <td>Performance.</td>
+                    <td><code>elapsed = duration - time_left</code>.</td>
+                    <td>FE hoy no lo muestra.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-success mt-3 mb-0" role="alert">
+              <div class="fw-semibold mb-1">Robustez (IDEMPOTENCIA IMPLEMENTADA)</div>
+              El endpoint <code>game-over</code> ya controla si el juego terminó. Si se llama dos veces, no inserta
+              duplicados en <code>player_results</code> y devuelve <code>status: already_finished</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" id="cfg-content">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">cfg_content — contrato del JSON (<code>instances</code>)</h2>
+          </div>
+          <div class="card-body">
+            <p class="text-secondary mb-3">
+              El backend espera que <code>cfg_content</code> sea un JSON válido y que contenga
+              <code>{"instances":[ ... ]}</code>. Si falta o no es array: <code>BAD_CFG_CONTENT</code>.
+            </p>
+
+            <div class="alert alert-info" role="alert">
+              <div class="fw-semibold mb-1">Idea central</div>
+              <code>instances</code> representa una secuencia de “pasos” (pantallas) que el FE navega con Prev/Next.
+              Algunas instancias son contenido (texto, imagen, video), otras son preguntas (<code>question</code>) y al
+              final puede haber una pantalla de resultados (<code>results</code>).
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th><code>type</code></th>
+                    <th>Campos esperados</th>
+                    <th>Qué renderiza el FE</th>
+                    <th>Notas importantes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>text_image</code></td>
+                    <td><code>title?</code>, <code>step_title?</code>, <code>text</code>, <code>image</code></td>
+                    <td>Texto (HTML) + imagen de fondo</td>
+                    <td>El texto va por <code>innerHTML</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>image_text</code></td>
+                    <td><code>title?</code>, <code>step_title?</code>, <code>text</code>, <code>image</code></td>
+                    <td>Imagen de fondo + texto (HTML)</td>
+                    <td>El texto va por <code>innerHTML</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>text_video</code></td>
+                    <td><code>title?</code>, <code>step_title?</code>, <code>text</code>, <code>video</code></td>
+                    <td>Texto (HTML) + video</td>
+                    <td>Muestra loader hasta <code>oncanplay</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>only_text</code></td>
+                    <td><code>title?</code>, <code>step_title?</code>, <code>text</code></td>
+                    <td>Solo texto (HTML)</td>
+                    <td>El texto va por <code>innerHTML</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>only_image</code></td>
+                    <td><code>title?</code>, <code>step_title?</code>, <code>image</code></td>
+                    <td>Solo imagen</td>
+                    <td>Se setea <code>src</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>intro_trivia</code></td>
+                    <td><code>title?</code>, <code>step_title?</code>, <code>text</code></td>
+                    <td>Pantalla intro de trivia</td>
+                    <td><code>text</code> va por <code>innerHTML</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>question</code></td>
+                    <td><code>step_title?</code>, <code>question</code>, <code>options[]</code>, <code>correct</code>,
+                      <code>explanation</code>, <code>points?</code>
+                    </td>
+                    <td>Pregunta con opciones</td>
+                    <td>En <code>game-start</code> el BE oculta <code>correct</code>/<code>explanation</code> al FE.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><code>results</code></td>
+                    <td><code>title?</code>, <code>step_title?</code></td>
+                    <td>Resumen de actividad</td>
+                    <td>El FE arma cards recorriendo preguntas respondidas.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="fw-semibold mt-4 mb-2">Ejemplo real (cfg_content)</div>
+            <pre class="bg-body border rounded p-3 mb-0"><code>{
+  "instances": [
+    {
+      "text": "&lt;p&gt;Lorem ipsum dolor sit amet...&lt;/p&gt;",
+      "type": "text_image",
+      "image": "img/img.jpg",
+      "title": "¿Qué es la Ciberseguridad?",
+      "step_title": "Introducción"
+    },
+    {
+      "text": "&lt;p&gt;Duis aute irure...&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Phishing&lt;/li&gt;&lt;/ul&gt;",
+      "type": "image_text",
+      "image": "img/img-2.jpg",
+      "title": "Tipos de Ataques",
+      "step_title": "Amenazas"
+    },
+    {
+      "text": "&lt;p&gt;Excepteur sint occaecat...&lt;/p&gt;",
+      "type": "text_video",
+      "title": "Aprende con este video",
+      "video": "https://.../chrome.webm",
+      "step_title": "Video Tutorial"
+    },
+    {
+      "text": "&lt;p&gt;Sed ut perspiciatis...&lt;/p&gt;",
+      "type": "only_text",
+      "title": "Resumen de lo aprendido",
+      "step_title": "Resumen"
+    },
+    {
+      "type": "only_image",
+      "image": "img/img-2.jpg",
+      "title": "Imagen",
+      "step_title": "Imagen"
+    },
+    {
+      "text": "Demuestra lo que has aprendido...",
+      "type": "intro_trivia",
+      "title": "¡Es hora de la Trivia!",
+      "step_title": "Intro Trivia"
+    },
+    {
+      "type": "question",
+      "points": 10,
+      "correct": 1,
+      "options": ["Malware","Phishing","Spam","Firewall"],
+      "question": "¿Cuál es la técnica más común de ingeniería social?",
+      "step_title": "Pregunta",
+      "explanation": "El phishing es la técnica más utilizada..."
+    },
+    {
+      "type": "question",
+      "points": 10,
+      "correct": 0,
+      "options": ["Multi-Factor Authentication","My First Account","Maximum Fiber Access"],
+      "question": "¿Qué significa MFA?",
+      "step_title": "Pregunta",
+      "explanation": "La autenticación de múltiples factores..."
+    },
+    {
+      "type": "results",
+      "title": "Resumen de tu actividad",
+      "step_title": "Resultados"
+    }
+  ]
+}</code></pre>
+
+            <div class="alert alert-secondary mt-3 mb-0" role="alert">
+              <div class="fw-semibold mb-1">Reglas “duras” del backend</div>
+              <ul class="mb-0">
+                <li><code>cfg_content</code> debe parsear como JSON y tener <code>instances</code> array.</li>
+                <li>Si <code>instances</code> está vacío: se considera inválido (<code>BAD_CFG_CONTENT</code>).</li>
+                <li>Las preguntas guardan <code>correct</code>/<code>explanation</code> en sesión, pero <span
+                    class="fw-semibold">no se envían</span> al FE en el start.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" id="session-model">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Modelo en sesión (lo que vive en $_SESSION durante la actividad)</h2>
+          </div>
+          <div class="card-body">
+            <p class="text-secondary mb-3">
+              Esto existe en <code>$_SESSION["trivia"][gid]</code>. El backend lo usa como fuente de verdad.
+              Además se guarda <code>$_SESSION["trivia_current_gid"]</code> con el último gid creado.
+            </p>
+
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Campo</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con Front-end</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>cfg_key</code></td>
+                    <td><code>string</code></td>
+                    <td>Clave de la config.</td>
+                    <td>Trazabilidad.</td>
+                    <td>No llega al FE.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_id</code></td>
+                    <td><code>number</code></td>
+                    <td>ID de config usada.</td>
+                    <td>Persistencia en results.</td>
+                    <td>No llega al FE.</td>
+                  </tr>
+                  <tr>
+                    <td><code>duration</code></td>
+                    <td><code>number</code></td>
+                    <td>Duración total.</td>
+                    <td>Calcular <code>finish_second</code>.</td>
+                    <td>FE hoy no lo usa visualmente.</td>
+                  </tr>
+                  <tr>
+                    <td><code>start_ts</code></td>
+                    <td><code>number</code></td>
+                    <td>Timestamp inicio.</td>
+                    <td>Calcular tiempo transcurrido.</td>
+                    <td>No llega al FE.</td>
+                  </tr>
+                  <tr>
+                    <td><code>instances</code></td>
+                    <td><code>array</code></td>
+                    <td>Lista completa (incluye correct/explanation en preguntas).</td>
+                    <td>Fuente de verdad para validar respuestas.</td>
+                    <td>FE recibe una versión “limpia” en <code>game-start</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>current_index</code></td>
+                    <td><code>number</code></td>
+                    <td>Índice actual (hoy no se usa activamente).</td>
+                    <td>Posible enforcement de progresión (futuro).</td>
+                    <td>FE maneja <code>estado.currentIndex</code> local.</td>
+                  </tr>
+                  <tr>
+                    <td><code>user_answers</code></td>
+                    <td><code>object</code></td>
+                    <td>Respuestas guardadas por índice.</td>
+                    <td>Puntaje final seguro.</td>
+                    <td>FE guarda respuestas local, pero el servidor no confía en eso.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ended</code></td>
+                    <td><code>0|1</code></td>
+                    <td>Actividad terminada.</td>
+                    <td>Bloquear acciones posteriores.</td>
+                    <td>FE redirige al terminar; BE también corta por este flag.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-warning mb-0" role="alert">
+              <div class="fw-semibold mb-1">Importante</div>
+              La progresión (Prev/Next) hoy es <span class="fw-semibold">100% del FE</span>. El backend valida
+              respuestas por <code>index</code>, pero no obliga “secuencia”.
+              Si querés que nadie pueda responder fuera de orden llamando el endpoint directo, hay que hacer enforcement
+              con <code>current_index</code> en el server.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" id="game-start">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center">
+              <div>
+                <h2 class="h5 mb-0"><code>POST ajax/game-start.php</code></h2>
+                <div class="text-secondary small">Crea una actividad nueva desde DB y devuelve el estado inicial
+                  (instances “limpias”).</div>
+              </div>
+              <span class="badge text-bg-success">Start</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="h6 mb-2">INPUT (Request POST)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Req.</th>
+                    <th>Default</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Validación / Sanitización</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>cfg_key</code></td>
+                    <td><code>string</code></td>
+                    <td><span class="badge text-bg-secondary">No</span></td>
+                    <td><code>juego_interactivo</code></td>
+                    <td>Clave para filtrar configs activas.</td>
+                    <td>Elegir qué experiencia cargar.</td>
+                    <td><code>trim()</code> + filtro en DB con tipado (<code>"s"</code>) +
+                      <code>NoSpecialChars()</code>.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-secondary mb-0" role="alert">
+              <div class="fw-semibold mb-1">Efecto colateral</div>
+              Antes de crear una nueva actividad, el endpoint llama <code>LimpiarPartida()</code> y borra
+              <code>$_SESSION["trivia"]</code> y <code>$_SESSION["trivia_current_gid"]</code>.
+              En la práctica: <span class="fw-semibold">solo puede existir una actividad activa por sesión</span>.
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT OK (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Garantías / Notas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>success</code></td>
+                    <td><code>0|1</code></td>
+                    <td>Éxito.</td>
+                    <td>Habilita el flujo.</td>
+                    <td>Controlado por BE.</td>
+                  </tr>
+                  <tr>
+                    <td><code>gid</code></td>
+                    <td><code>string</code></td>
+                    <td>ID de actividad.</td>
+                    <td>Identificar sesión.</td>
+                    <td>Generado aleatorio (hex).</td>
+                  </tr>
+                  <tr>
+                    <td><code>duration</code></td>
+                    <td><code>number</code></td>
+                    <td>Duración total.</td>
+                    <td>Analítica/tiempo.</td>
+                    <td>Desde DB.</td>
+                  </tr>
+                  <tr>
+                    <td><code>time_left</code></td>
+                    <td><code>number</code></td>
+                    <td>Tiempo restante inicial.</td>
+                    <td>Referencia.</td>
+                    <td>Inicialmente igual a <code>duration</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>instances</code></td>
+                    <td><code>array</code></td>
+                    <td>Pasos del flujo.</td>
+                    <td>Renderizar screens.</td>
+                    <td>Para <code>question</code> se ocultan <code>correct</code> y <code>explanation</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>status</code></td>
+                    <td><code>string</code></td>
+                    <td>Estado inicial.</td>
+                    <td>Continuidad.</td>
+                    <td>Siempre <code>playing</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>message</code></td>
+                    <td><code>string</code></td>
+                    <td>Mensaje UI.</td>
+                    <td>Feedback.</td>
+                    <td>Hoy viene vacío.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT ERROR (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Formato</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>{ "success": 0, "error": "NO_CONFIGS" }</code></td>
+                    <td>No hay configs activas para ese <code>cfg_key</code>.</td>
+                    <td>FE muestra error y no arranca.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-responsive mt-3">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Cuándo pasa</th>
+                    <th>Qué significa</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="badge text-bg-danger">NO_CONFIGS</span></td>
+                    <td>No hay filas activas con ese <code>cfg_key</code>.</td>
+                    <td>Falta data/configuración.</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge text-bg-danger">RANDOM_FAIL</span></td>
+                    <td>No se pudo elegir random (caso borde).</td>
+                    <td>Diagnóstico.</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge text-bg-danger">BAD_CFG_CONTENT</span></td>
+                    <td><code>cfg_content</code> inválido o sin <code>instances</code>.</td>
+                    <td>Evitar iniciar actividad corrupta.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="fw-semibold mt-4 mb-2">Ejemplo OK</div>
+            <pre class="bg-body border rounded p-3 mb-0"><code>{
+  "success": 1,
+  "gid": "0a1b2c3d4e5f00112233445566778899",
+  "duration": 60,
+  "time_left": 60,
+  "instances": [
+    { "type":"text_image", "title":"...", "step_title":"...", "text":"&lt;p&gt;...&lt;/p&gt;", "image":"img/a.jpg" },
+    { "type":"question", "step_title":"Pregunta", "question":"¿...?", "options":["A","B","C"], "points":10 }
+  ],
+  "status": "playing",
+  "message": ""
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" id="action">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center">
+              <div>
+                <h2 class="h5 mb-0"><code>POST ajax/action.php</code></h2>
+                <div class="text-secondary small">Operaciones: hoy solo <code>check_answer</code> para validar
+                  preguntas.</div>
+              </div>
+              <span class="badge text-bg-primary">Action</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="h6 mb-2">INPUT (Request POST)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Req.</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Validación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>gid</code></td>
+                    <td><code>string</code></td>
+                    <td><span class="badge text-bg-success">Sí</span></td>
+                    <td>ID de actividad.</td>
+                    <td>Encontrar partida en sesión.</td>
+                    <td>Si no existe: <code>BAD_GID</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>op</code></td>
+                    <td><code>string</code></td>
+                    <td><span class="badge text-bg-success">Sí</span></td>
+                    <td>Operación.</td>
+                    <td>Elegir lógica.</td>
+                    <td>Solo <code>check_answer</code>. Si no: <code>BAD_OP</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>index</code></td>
+                    <td><code>number</code></td>
+                    <td><span class="badge text-bg-success">Sí</span></td>
+                    <td>Índice dentro de <code>instances</code>.</td>
+                    <td>Resolver qué pregunta se responde.</td>
+                    <td>Si no existe: <code>INVALID_INDEX</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>selected</code></td>
+                    <td><code>number</code></td>
+                    <td><span class="badge text-bg-success">Sí</span></td>
+                    <td>Opción elegida (índice).</td>
+                    <td>Comparar contra <code>correct</code>.</td>
+                    <td>Hoy no valida rango explícito; se compara directo con <code>correct</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-secondary mb-0" role="alert">
+              <div class="fw-semibold mb-1">Regla de negocio aplicada por el backend</div>
+              El puntaje de cada pregunta es:
+              <span class="fw-semibold">si es correcta →</span> <code>inst.points</code> (si existe) o <code>10</code>;
+              <span class="fw-semibold">si es incorrecta →</span> <code>0</code>.
+              Además se guarda en sesión en <code>user_answers[index]</code> para cálculo final seguro.
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT OK (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Garantías / Notas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>success</code></td>
+                    <td><code>0|1</code></td>
+                    <td>Éxito.</td>
+                    <td>Confirmar validación.</td>
+                    <td>Controlado.</td>
+                  </tr>
+                  <tr>
+                    <td><code>isCorrect</code></td>
+                    <td><code>boolean</code></td>
+                    <td>Si la respuesta fue correcta.</td>
+                    <td>UI feedback.</td>
+                    <td>Comparación <code>selected === correct</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>correctIndex</code></td>
+                    <td><code>number</code></td>
+                    <td>Índice correcto real.</td>
+                    <td>Mostrar respuesta correcta (si se quiere).</td>
+                    <td>Sale de DB (instancia en sesión).</td>
+                  </tr>
+                  <tr>
+                    <td><code>points</code></td>
+                    <td><code>number</code></td>
+                    <td>Puntos ganados en esta pregunta.</td>
+                    <td>Acumular score.</td>
+                    <td>Correcta suma; incorrecta 0.</td>
+                  </tr>
+                  <tr>
+                    <td><code>explanation</code></td>
+                    <td><code>string</code></td>
+                    <td>Explicación/tip asociado.</td>
+                    <td>UI final / feedback.</td>
+                    <td>Se devuelve solo al responder (no en start).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT ERROR (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Formato</th>
+                    <th>Qué significa</th>
+                    <th>Recomendación FE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>{ "success": 0, "error": "BAD_GID" }</code></td>
+                    <td>No existe la sesión de ese gid.</td>
+                    <td>Reiniciar con <code>game-start</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>{ "success": 0, "error": "GAME_ALREADY_ENDED" }</code></td>
+                    <td>La actividad ya terminó.</td>
+                    <td>Evitar enviar más requests.</td>
+                  </tr>
+                  <tr>
+                    <td><code>{ "success": 0, "error": "INVALID_INDEX" }</code></td>
+                    <td>El índice no existe.</td>
+                    <td>Bug o request manual; loggear.</td>
+                  </tr>
+                  <tr>
+                    <td><code>{ "success": 0, "error": "NOT_A_QUESTION" }</code></td>
+                    <td>La instancia referida no es pregunta.</td>
+                    <td>Bug en FE (no debería pasar).</td>
+                  </tr>
+                  <tr>
+                    <td><code>{ "success": 0, "error": "BAD_OP" }</code></td>
+                    <td>Operación inválida.</td>
+                    <td>Revisar contrato.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-12 col-lg-6">
+                <div class="fw-semibold mb-2">Ejemplo OK (respuesta correcta)</div>
+                <pre class="bg-body border rounded p-3 mb-0"><code>{
+  "success": 1,
+  "isCorrect": true,
+  "correctIndex": 1,
+  "points": 10,
+  "explanation": "El phishing es la técnica más utilizada..."
+}</code></pre>
+              </div>
+              <div class="col-12 col-lg-6">
+                <div class="fw-semibold mb-2">Ejemplo ERROR (gid inválido)</div>
+                <pre class="bg-body border rounded p-3 mb-0"><code>{
+  "success": 0,
+  "error": "BAD_GID"
+}</code></pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" id="game-over">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center">
+              <div>
+                <h2 class="h5 mb-0"><code>POST ajax/game-over.php</code></h2>
+                <div class="text-secondary small">Finaliza y guarda resultado en <code>player_results</code> (puntos
+                  calculados del lado servidor).</div>
+              </div>
+              <span class="badge text-bg-dark">Finish</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="h6 mb-2">INPUT (Request POST)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Req.</th>
+                    <th>Descripción</th>
+                    <th>Validación</th>
+                    <th>Notas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>gid</code></td>
+                    <td><code>string</code></td>
+                    <td><span class="badge text-bg-success">Sí</span></td>
+                    <td>ID de actividad.</td>
+                    <td>Si no existe: <code>BAD_GID</code>.</td>
+                    <td>Debe mandarse una sola vez.</td>
+                  </tr>
+                  <tr>
+                    <td><code>points</code></td>
+                    <td><code>number</code></td>
+                    <td><span class="badge text-bg-secondary">No</span></td>
+                    <td>Puntaje calculado por FE.</td>
+                    <td>No se valida.</td>
+                    <td><span class="fw-semibold">El backend lo ignora</span> y recalcula desde sesión.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-warning mb-0" role="alert">
+              <div class="fw-semibold mb-1">Nota</div>
+              Aunque el FE hoy manda <code>points</code>, el endpoint no lo usa. Esto está bien para evitar cheating,
+              pero si querés limpiar el contrato, podés dejar de enviarlo desde el FE.
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT OK (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Garantías / Notas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>success</code></td>
+                    <td><code>0|1</code></td>
+                    <td>Confirmación del insert.</td>
+                    <td>Saber si guardó en DB.</td>
+                    <td>Controlado.</td>
+                  </tr>
+                  <tr>
+                    <td><code>status</code></td>
+                    <td><code>string</code></td>
+                    <td>Outcome persistido.</td>
+                    <td>Analítica.</td>
+                    <td>Hoy siempre <code>finished</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>points</code></td>
+                    <td><code>number</code></td>
+                    <td>Puntaje final.</td>
+                    <td>Ranking/estadística.</td>
+                    <td>Calculado desde sesión.</td>
+                  </tr>
+                  <tr>
+                    <td><code>finish_second</code></td>
+                    <td><code>number</code></td>
+                    <td>Segundos transcurridos.</td>
+                    <td>Performance.</td>
+                    <td><code>elapsed = duration - time_left</code> (clamp).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT ERROR (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Formato</th>
+                    <th>Qué significa</th>
+                    <th>Recomendación FE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>{ "success": 0, "error": "BAD_GID" }</code></td>
+                    <td>No existe la sesión de ese gid.</td>
+                    <td>Reiniciar flujo.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="fw-semibold mt-4 mb-2">Ejemplo OK</div>
+            <pre class="bg-body border rounded p-3 mb-0"><code>{
+  "success": 1,
+  "status": "finished",
+  "points": 20,
+  "finish_second": 42
+}</code></pre>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" id="flow">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Flujo del Front-end (cómo se conectan los endpoints)</h2>
+          </div>
+          <div class="card-body">
+            <ol class="mb-0">
+              <li class="mb-2">
+                <span class="fw-semibold">Start:</span> <code>POST game-start</code> con
+                <code>cfg_key=juego_interactivo</code> →
+                guarda <code>gid</code>, carga <code>instances</code> y setea <code>currentIndex=0</code>.
+              </li>
+              <li class="mb-2">
+                <span class="fw-semibold">Slider:</span> renderiza cards por instancia usando <code>step_title</code> y
+                estados visuales (locked/success/active).
+                Se inicializa Slick y se hace <code>slickGoTo(currentIndex)</code>.
+              </li>
+              <li class="mb-2">
+                <span class="fw-semibold">Pantallas:</span> según <code>inst.type</code> muestra un
+                <code>screen-*</code> y completa contenido:
+                texto (HTML), imagen, video, etc.
+              </li>
+              <li class="mb-2">
+                <span class="fw-semibold">Pregunta:</span> al elegir opción, llama <code>POST action</code> con
+                <code>{ gid, op:"check_answer", index: currentIndex, selected: idx }</code>.
+                Si <code>success=1</code>, guarda la respuesta en <code>estado.userAnswers[currentIndex]</code>.
+              </li>
+              <li class="mb-2">
+                <span class="fw-semibold">Validación Next:</span> si la pantalla actual es <code>question</code> y no
+                está respondida,
+                no deja avanzar (efecto <code>error-flash</code>).
+              </li>
+              <li>
+                <span class="fw-semibold">Finish:</span> en la última instancia, el botón Finish llama
+                <code>POST game-over</code> con el <code>gid</code>.
+                El backend guarda <code>player_results</code> y el FE redirige a <code>index.html</code>.
+              </li>
+            </ol>
+
+            <div class="alert alert-info mt-3 mb-0" role="alert">
+              <div class="fw-semibold mb-1">Nota</div>
+              No hay endpoint de “tick” ni sincronización de timer en el loop. El tiempo se usa como métrica de
+              <code>finish_second</code> en el <code>game-over</code>.
+              Si querés forzar límite real (auto-finish), habría que agregar lógica server-side y/o un endpoint de
+              estado.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12" id="edge-cases">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Casos borde (lo que puede romper o confundir)</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">HTML en DB (XSS)</div>
+                    <ul class="mb-0">
+                      <li>Se renderiza <code>inst.text</code> con <code>innerHTML</code>.</li>
+                      <li>Si el contenido no está controlado, hay riesgo.</li>
+                      <li>Solución: sanitizar HTML (allowlist) o pasar a <code>textContent</code>.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">Responder fuera de orden</div>
+                    <ul class="mb-0">
+                      <li>El server valida por <code>index</code>, pero no obliga progresión.</li>
+                      <li>Un request manual podría responder cualquier pregunta.</li>
+                      <li>Solución: enforcement con <code>current_index</code> y “lock” server-side.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">Finish duplicado</div>
+                    <ul class="mb-0">
+                      <li>El FE redirige rápido, pero puede haber reintento.</li>
+                      <li>Solución: unique por <code>res_game_id</code> o chequeo idempotente.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">selected fuera de rango</div>
+                    <ul class="mb-0">
+                      <li>Hoy no hay validación explícita de rango para <code>selected</code>.</li>
+                      <li>No rompe la comparación, pero puede dejar “basura” guardada.</li>
+                      <li>Solución: validar <code>0..(count(options)-1)</code>.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="alert alert-secondary mt-3 mb-0" role="alert">
+              <div class="fw-semibold mb-1">Sugerencia de mejora (contrato)</div>
+              Si querés un contrato más “prolijo” para FE:
+              1) no mandar <code>points</code> en <code>game-over</code> desde FE,
+              2) devolver en <code>game-over</code> también <code>time_left</code> y/o <code>duration</code> para
+              debugging,
+              3) exponer un endpoint opcional <code>state</code> para recuperar estado si se refresca la página.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+            <div class="text-secondary small">
+              Guardalo como <code>documentacion/juego-interactivo.html</code>. Todo es visible en el DOM →
+              <code>Ctrl+F</code> funciona perfecto.
+            </div>
+            <div class="d-flex gap-2">
+              <a class="btn btn-outline-secondary btn-sm" href="#top">Arriba</a>
+              <a class="btn btn-primary btn-sm" href="#db">DB</a>
+              <a class="btn btn-primary btn-sm" href="#cfg-content">cfg_content</a>
+              <a class="btn btn-primary btn-sm" href="#game-start">game-start</a>
+              <a class="btn btn-primary btn-sm" href="#action">action</a>
+              <a class="btn btn-primary btn-sm" href="#game-over">game-over</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY2lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

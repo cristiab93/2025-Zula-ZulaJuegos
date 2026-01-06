@@ -7,7 +7,7 @@ if($_SERVER['HTTP_HOST'] == 'localhost:82' || $_SERVER['HTTP_HOST'] == 'localhos
 	define("DBPASSWORD", "511xpWgxUR4icML4");
 	define("DBNAME", "zula_juegos");
 	define("DEPURAR", 0);
-	define("BASEURL", "http://localhost/zula_juegos/connect_words/");
+	define("BASEURL", "http://localhost/zula_juegos/trivia/");
 }
 else
 {

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zula</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="container vh-100 position-relative">
+        <div class="row align-items-center justify-content-center vh-100">
+            <div class="col-12">
+                <div class="card rounded-1 fit-content ms-auto px-2 bg-subtle mt-2">
+                    <p class="font10 mb-0 fw-500" id="progress-counter">1/20</p>
+                </div>
+
+                <!-- TITULAR -->
+
+                <h2 class="fw-700 text-black" id="main-title" style="display:none;">¿Qué es el Phishing?</h2>
+
+                <!-- TEXTO + IMAGEN -->
+
+                <div class="row trivia-screen" id="screen-text-image" style="display:none;">
+                    <div class="col-12 col-lg-6 mt-4" id="text-image-content">
+                        <!-- Content will be injected here -->
+                    </div>
+                    <div class="col-12 col-lg-6 mt-4">
+                        <div class="background-img rounded-4" id="text-image-img"
+                            style="background-image: url(img/img.jpg);"></div>
+                    </div>
+                </div>
+
+
+                <!-- IMAGEN + TEXTO -->
+
+                <div class="row trivia-screen" id="screen-image-text" style="display:none;">
+                    <div class="col-12 col-lg-6 mt-4">
+                        <div class="background-img rounded-4" id="image-text-img"
+                            style="background-image: url(img/img.jpg);"></div>
+                    </div>
+                    <div class="col-12 col-lg-6 mt-4" id="image-text-content">
+                        <!-- Content will be injected here -->
+                    </div>
+                </div>
+
+
+                <!-- TEXTO + VIDEO YOUTUBE -->
+
+                <div class="row trivia-screen" id="screen-text-video" style="display:none;">
+                    <div class="col-12 col-lg-6 mt-4" id="text-video-content">
+                        <!-- Content will be injected here -->
+                    </div>
+                    <div id="video-container"
+                        class="col-12 col-lg-6 mt-4 position-relative d-flex align-items-center justify-content-center rounded-4"
+                        style="min-height: 250px; background: #fdfdfd; border: 2px dashed #e0e0e0;">
+                        <div id="video-loader" class="spinner-border text-primary" role="status"
+                            style="position: absolute; z-index: 10;">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <video id="text-video-src" src="" class="rounded-4 w-100" autoplay muted loop
+                            style="display: none;"></video>
+                    </div>
+                </div>
+
+                <!-- 100% TEXTO -->
+
+                <div class="row trivia-screen" id="screen-only-text" style="display:none;">
+                    <div class="col-12 mt-4" id="only-text-content">
+                        <!-- Content will be injected here -->
+                    </div>
+                </div>
+
+                <!-- 100% IMAGEN -->
+
+                <div class="row trivia-screen" id="screen-only-image" style="display:none;">
+                    <div class="col-12 mt-4">
+                        <img id="only-image-src" src="" class="img-fluid">
+                    </div>
+                </div>
+
+                <!-- BLOQUE PREGUNTAS -->
+                <div class="row justify-content-center cards-ob trivia-screen" id="screen-intro-trivia"
+                    style="display:none;">
+                    <div class="col-10 col-lg-10 text-center">
+                        <div class="fit-content bg-orange-300 p-2 d-flex align-items-center mx-auto mb-4 rounded-3">
+                            <div class="bg-orange-100 wh-45 rounded-3">
+                                <img src="img/preguntas.svg">
+                            </div>
+                            <p class="text-orange ms-3 mb-0 fw-600 pe-2 font14">BLOQUE PREGUNTAS</p>
+                        </div>
+                        <h1 class="mb-3 fw-700 text-black" id="intro-trivia-title">Pon a prueba lo aprendido</h1>
+                        <p class="gray-700 font14" id="intro-trivia-desc">Responde las siguientes preguntas de la trivia
+                            y sumá puntos. <br>
+                            Recibirás feedback inmediato y tips de refuerzo después de cada respuesta.</p>
+                    </div>
+                    <div class="col-12 col-md-4 col-xl-3 mt-4">
+                        <div class="card rounded-4">
+                            <div class="card-body p-4">
+                                <div class="bg-orange-100 wh-45 rounded-3 mb-3">
+                                    <img src="img/preguntas.svg">
+                                </div>
+                                <h3 class="fw-700 text-black">3 Preguntas</h3>
+                                <p class="mb-0 text-black font14">Opción múltiple con una sola respuesta correcta</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 col-xl-3 mt-4">
+                        <div class="card rounded-4">
+                            <div class="card-body p-4">
+                                <div class="bg-orange-100 wh-45 rounded-3 mb-3">
+                                    <img src="img/feedback.svg">
+                                </div>
+                                <h3 class="fw-700 text-black">Feedback inmediato</h3>
+                                <p class="mb-0 text-black font14">Sabrás al instante si acertaste</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 col-xl-3 mt-4">
+                        <div class="card rounded-4">
+                            <div class="card-body p-4">
+                                <div class="bg-orange-100 wh-45 rounded-3 mb-3">
+                                    <img src="img/time.svg">
+                                </div>
+                                <h3 class="fw-700 text-black">Sin límite de tiempo</h3>
+                                <p class="mb-0 text-black font14">Tómate el tiempo que necesites</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BLOQUE PREGUNTAS 1 -->
+                <div class="row trivia-screen" id="screen-question" style="display:none;">
+                    <h2 class="fw-700 text-black text-center" id="question-text">¿Cuál de estas es una señal de alerta
+                        de phishing?</h2>
+                    <div class="d-flex justify-content-center flex-column col-lg-8 col-xl-7 mx-auto mt-5"
+                        id="options-container">
+                        <!-- Options will be injected here -->
+                    </div>
+                </div>
+
+
+                <!-- BLOQUE RESULTADOS PREGUNTAS -->
+
+                <div class="row justify-content-center trivia-screen" id="screen-results" style="display:none;">
+                    <div class="col-10 col-lg-10 text-center">
+                        <div class="fit-content bg-orange-300 p-2 d-flex align-items-center mx-auto mb-4 rounded-3">
+                            <div class="bg-orange-100 wh-45 rounded-3">
+                                <img src="img/preguntas.svg">
+                            </div>
+                            <p class="text-orange ms-3 mb-0 fw-600 pe-2 font14">RESULTADOS PREGUNTAS</p>
+                        </div>
+                        <h1 class="mb-1 fw-700 text-black font18" id="results-score">Sumaste 10 puntos</h1>
+                        <p class="gray-700 font11" id="results-summary">Respondiste 1 de 3</p>
+                    </div>
+                    <div class="row justify-content-center mt-2" id="results-cards-container">
+                        <!-- Result cards will be injected here -->
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- BOTÓN FINALIZAR ACTIVIDAD -->
+
+                <div class="d-flex justify-content-center align-items-center d-none" id="nav-finish">
+                    <a href="#" class="btn fw-600 btn-primary px-3 py-2 font12" id="btn-finish">Finalizar actividad <img
+                            src="img/arrow.svg" height="11" class="ms-2"> </a>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center" id="nav-standard">
+                    <a href="javascript:void(0)" class="btn fw-600 btn-primary-outline px-3 py-2 font12"
+                        id="btn-prev"><img src="img/arrow-left.svg" class="me-2"> Anterior </a>
+                    <a href="javascript:void(0)" class="btn fw-600 btn-primary px-3 py-2 font12" id="btn-next">Continuar
+                        <img src="img/arrow.svg" height="11" class="ms-2"> </a>
+                </div>
+
+                <hr>
+
+
+
+                <div class="steps-slider" id="steps-slider-container">
+                    <!-- Step cards will be injected here -->
+                </div>
+
+
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="timeout" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+
+                <div class="modal-body text-center">
+                    <div class="bg-red-200 fit-content mx-auto p-2 rounded-3 mt-4">
+                        <img src="img/sad.svg" height="32">
+                    </div>
+                    <h4 class="fw-700 mb-0 mt-3">LAMENTABLEMENTE</h4>
+                    <p class="font12 text-red-700">Se te terminó el tiempo</p>
+
+                    <p class="text-black mb-0">Restaste en total 80 puntos</p>
+                    <p class="font10 text-grey-500 mb-0">Respondiste 5 de 8</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary font11 px-3 fw-500">Volver a la Misión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+    <script>
+        $('.steps-slider').slick({
+            slidesToShow: 10.5,
+            slidesToScroll: 1,
+            infinite: false,
+            arrows: false,
+            dots: false,
+            swipeToSlide: true,
+            touchThreshold: 10,
+            responsive: [
+                {
+                    breakpoint: 1200,
+                    settings: {
+                        slidesToShow: 6.5
+                    }
+                },
+                {
+                    breakpoint: 1400,
+                    settings: {
+                        slidesToShow: 8.5
+                    }
+                },
+                {
+                    breakpoint: 768,
+                    settings: {
+                        slidesToShow: 3
+                    }
+                }
+            ]
+        });
+    </script>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/game.js"></script>
+</body>
+
+</html>
