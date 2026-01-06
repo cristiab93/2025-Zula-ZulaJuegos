@@ -8,7 +8,9 @@ body {
     height: 100%;
     position: relative;
 }
-
+.bg-green-100 {background-color: #D9FBD0;}
+.bg-blue-100 {background-color: #E5EDFF;}
+.bg-red-100 {background-color: #FFE0DB;}
 /* CONNECT WORDS */
 .bg-lines {
     background-color: #ffffff;
