@@ -1,0 +1,1162 @@
+<!doctype html>
+<html lang="es-AR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect Words — Documentación (API + DB)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="#top">Connect Words — Documentación</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav"
+        aria-controls="topNav" aria-expanded="false" aria-label="Abrir navegación">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="topNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#overview">Overview</a></li>
+          <li class="nav-item"><a class="nav-link" href="#security">Sanitización</a></li>
+          <li class="nav-item"><a class="nav-link" href="#db">DB</a></li>
+          <li class="nav-item"><a class="nav-link" href="#session-model">Sesión</a></li>
+          <li class="nav-item"><a class="nav-link" href="#game-start">game-start</a></li>
+          <li class="nav-item"><a class="nav-link" href="#action">action</a></li>
+          <li class="nav-item"><a class="nav-link" href="#game-over">game-over</a></li>
+          <li class="nav-item"><a class="nav-link" href="#flow">Flujo FE</a></li>
+          <li class="nav-item"><a class="nav-link" href="#edge-cases">Casos borde</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4" id="top">
+    <div class="row g-4">
+
+      <!-- Overview -->
+      <div class="col-12" id="overview">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h1 class="h3 mb-2">Connect Words — Endpoints + DB + Contrato JSON</h1>
+            <p class="text-secondary mb-0">
+              Documentación completa de:
+              <span class="fw-semibold">inputs/outputs</span> de cada endpoint,
+              reglas exactas del backend,
+              relación con el front-end (<code>game.js</code>),
+              y detalle del <code>cfg_content</code> de DB (cómo construye el puzzle).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sanitización / Seguridad -->
+      <div class="col-12" id="security">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Sanitización, validación y garantías del contrato</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">Entrada (INPUT) — validación y sanitización</div>
+                    <ul class="mb-0">
+                      <li><span class="fw-semibold">Trim:</span> todos los params vienen de <code>$_POST</code> y se
+                        hacen <code>trim()</code> con <code>ObtenerParam()</code>.</li>
+                      <li><span class="fw-semibold">Tipos:</span> <code>from</code> y <code>to</code> se castean a
+                        <code>int</code>.</li>
+                      <li><span class="fw-semibold">GID:</span> <code>ValidarGid()</code> exige que exista en
+                        <code>$_SESSION["connect_words"][gid]</code>. Si no, <code>BAD_GID</code>.</li>
+                      <li><span class="fw-semibold">Índices:</span> en <code>swap</code> se validan contra
+                        <code>0..(cols*rows-1)</code>. Si no, <code>BAD_INDEX</code>.</li>
+                      <li><span class="fw-semibold">Operación:</span> solo <code>tick</code> y <code>swap</code>. Si no,
+                        <code>BAD_OP</code>.</li>
+                      <li><span class="fw-semibold">cfg_key:</span> en <code>game-start</code> se usa como filtro en DB
+                        con tipado de query (<code>"s"</code>) y <code>NoSpecialChars()</code> en el select.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">Salida (OUTPUT) — qué se garantiza</div>
+                    <ul class="mb-0">
+                      <li>Respuestas en JSON con <code>json_encode(..., JSON_UNESCAPED_UNICODE)</code>.</li>
+                      <li><code>time_left</code> siempre “clamp”: nunca menor a 0 ni mayor a <code>duration</code>.</li>
+                      <li><code>board</code> es la fuente de verdad del servidor (el FE debe reconciliar siempre).</li>
+                      <li><code>tiles_solved</code> refleja grupos resueltos del servidor y bloquea swaps de forma
+                        autoritativa.</li>
+                      <li>En FE se renderiza texto con <code>textContent</code> (seguro, no interpreta HTML).</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="alert alert-warning mb-0" role="alert">
+                  <div class="fw-semibold mb-1">Nota importante (palabras en cfg_content)</div>
+                  El backend no “limpia” palabras del JSON de DB porque se asumen texto. La seguridad UI hoy depende de
+                  que el FE use
+                  <code>textContent</code>. Si alguien cambia a <code>innerHTML</code>, puede aparecer XSS si en DB se
+                  cuela HTML.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DB -->
+      <div class="col-12" id="db">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Base de datos — tablas involucradas</h2>
+          </div>
+          <div class="card-body">
+            <p class="text-secondary mb-3">
+              El juego se alimenta desde <code>game_configs</code> y guarda resultados en <code>player_results</code>.
+              El campo clave es <code>cfg_content</code> (JSON del puzzle).
+            </p>
+
+            <h3 class="h6 mb-2">Tabla <code>game_configs</code> (origen del puzzle)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Campo</th>
+                    <th>Tipo (orientativo)</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con Backend</th>
+                    <th>Relación con Front-end</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>cfg_id</code></td>
+                    <td><code>INT</code></td>
+                    <td>ID de la config.</td>
+                    <td>Trazabilidad de qué puzzle se usó.</td>
+                    <td>Se guarda en sesión (<code>cfg_id</code>) y se persiste como <code>res_game_config_id</code>.
+                    </td>
+                    <td>No se usa directo.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_key</code></td>
+                    <td><code>VARCHAR</code></td>
+                    <td>Familia de puzzles (ej: <code>connect_words</code>).</td>
+                    <td>Agrupar configs por juego.</td>
+                    <td><code>game-start.php</code> filtra por <code>cfg_key</code> y <code>cfg_active</code>.</td>
+                    <td>FE manda <code>cfg_key</code> al iniciar.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_level</code></td>
+                    <td><code>INT</code></td>
+                    <td>Nivel/dificultad.</td>
+                    <td>Segmentar puzzles (futuro).</td>
+                    <td>Hoy no influye en la elección (se elige random entre activas).</td>
+                    <td>No se usa directo.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_active</code></td>
+                    <td><code>TINYINT(1)</code></td>
+                    <td>Flag activa (1) o inactiva (0).</td>
+                    <td>Habilitar/deshabilitar puzzles sin borrar.</td>
+                    <td>Si no hay activas: error <code>NO_CONFIGS</code>.</td>
+                    <td>FE muestra error si <code>success=0</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_duration</code></td>
+                    <td><code>INT</code></td>
+                    <td>Duración total (seg).</td>
+                    <td>Definir tiempo de juego.</td>
+                    <td>Se guarda en sesión como <code>duration</code> y se usa para <code>time_left</code>.</td>
+                    <td>FE usa <code>duration</code> para progress ring y base del timer.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_content</code></td>
+                    <td><code>TEXT / JSON</code></td>
+                    <td>JSON del puzzle (grupos y palabras).</td>
+                    <td>Define el tablero completo (N x N).</td>
+                    <td>Se valida, se parsea y se generan <code>board</code>, <code>word_map</code>,
+                      <code>group_map</code>.</td>
+                    <td>FE recibe <code>groups</code> + <code>word_map</code> y deduce “grupo por tile”.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_created</code></td>
+                    <td><code>DATETIME</code></td>
+                    <td>Fecha de creación.</td>
+                    <td>Auditoría.</td>
+                    <td>Hoy no se usa directo (se ordena por <code>cfg_id DESC</code>).</td>
+                    <td>No se usa directo.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-info mt-3" role="alert">
+              <div class="fw-semibold mb-1">cfg_content (explicación ultra detallada)</div>
+              <div class="small">
+                <div class="mb-2"><span class="fw-semibold">Formato esperado:</span>
+                  <code>{"groups":[{"key":"...","words":[...]}...]}</code></div>
+                <div class="mb-2">
+                  <span class="fw-semibold">Regla dura del backend:</span>
+                  si hay <code>N</code> grupos, cada grupo debe tener exactamente <code>N</code> palabras.
+                  Eso fija el tablero como <code>N x N</code>.
+                </div>
+                <div class="mb-2">
+                  <span class="fw-semibold">Qué construye el backend:</span>
+                  <ul class="mb-0">
+                    <li><code>tileId</code> consecutivo (<code>"1"</code>, <code>"2"</code>, ...).</li>
+                    <li><code>word_map[tileId]=palabra</code> para el texto.</li>
+                    <li><code>group_map[tileId]=groupKey</code> para resolver filas en backend.</li>
+                    <li><code>board</code> (array de tileIds) como layout fuente de verdad.</li>
+                    <li>Board inicial “anti-resuelto”: cada fila arranca con 1 palabra de cada grupo (y se mezcla).</li>
+                  </ul>
+                </div>
+                <div class="mb-2">
+                  <span class="fw-semibold">Qué hace el front:</span>
+                  no recibe <code>group_map</code> desde server. Usa <code>groups.words</code> + <code>word_map</code>
+                  para deducir el grupo
+                  normalizando texto (sin tildes, minúsculas, etc.).
+                </div>
+                <div class="mb-0">
+                  <span class="fw-semibold">Recomendación:</span> evitar palabras duplicadas “normalizadas” entre
+                  grupos, porque el mapping del FE puede confundir.
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12 col-lg-6">
+                <div class="fw-semibold mb-2">Ejemplo real (tu cfg_content)</div>
+                <pre class="bg-body border rounded p-3 mb-0"><code>{
+  "groups": [
+    { "key": "riesgos_basicos", "words": ["Virus", "Spam", "Phishing"] },
+    { "key": "protecciones_basicas", "words": ["Antivirus", "Firewall", "Backup"] },
+    { "key": "dispositivos_y_wifi", "words": ["Computadora", "Celular", "Router"] }
+  ]
+}</code></pre>
+              </div>
+              <div class="col-12 col-lg-6">
+                <div class="fw-semibold mb-2">Qué implica ese JSON</div>
+                <ul class="mb-0">
+                  <li><span class="fw-semibold">N=3</span> → tablero <span class="fw-semibold">3x3</span> → 9 tiles.
+                  </li>
+                  <li>Se generan tileIds <code>"1"</code>..<code>"9"</code>.</li>
+                  <li>El FE recibe <code>cols=3</code> y <code>rows=3</code> para renderizar 3 filas.</li>
+                </ul>
+                <div class="alert alert-secondary mt-3 mb-0" role="alert">
+                  <div class="fw-semibold mb-1">Validación del cfg_content</div>
+                  El backend valida estructura (groups, key, words[] y la regla N=N). Si falla →
+                  <code>BAD_CFG_CONTENT</code>.
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <h3 class="h6 mb-2">Tabla <code>player_results</code> (persistencia del resultado)</h3>
+            <p class="text-secondary mb-3">
+              Se inserta desde <code>ajax/game-over.php</code> con <code>InsertQuery("player_results")</code>.
+            </p>
+
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Campo</th>
+                    <th>Tipo (orientativo)</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con Backend</th>
+                    <th>Relación con Front-end</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>res_game_config_id</code></td>
+                    <td><code>INT</code></td>
+                    <td>ID config usada.</td>
+                    <td>Trazabilidad del puzzle.</td>
+                    <td>Se llena con <code>s["cfg_id"]</code>.</td>
+                    <td>No se usa directo.</td>
+                  </tr>
+                  <tr>
+                    <td><code>res_player_id</code></td>
+                    <td><code>INT</code></td>
+                    <td>ID jugador.</td>
+                    <td>Asociar a usuario.</td>
+                    <td>Hoy es <code>0</code> fijo.</td>
+                    <td>No se usa directo.</td>
+                  </tr>
+                  <tr>
+                    <td><code>res_game_id</code></td>
+                    <td><code>VARCHAR</code></td>
+                    <td>GID (partida).</td>
+                    <td>Identificador del match.</td>
+                    <td>Se llena con <code>$gid</code>.</td>
+                    <td>FE lo manda en game-over.</td>
+                  </tr>
+                  <tr>
+                    <td><code>res_outcome</code></td>
+                    <td><code>VARCHAR</code></td>
+                    <td><code>won</code> / <code>lost</code>.</td>
+                    <td>Resultado final.</td>
+                    <td>Se calcula con solved_groups vs cols.</td>
+                    <td>FE ya lo muestra; esto lo persiste.</td>
+                  </tr>
+                  <tr>
+                    <td><code>res_points</code></td>
+                    <td><code>INT</code></td>
+                    <td>Puntaje final.</td>
+                    <td>Rankings/estadística.</td>
+                    <td><code>points = solved_groups * 25</code>.</td>
+                    <td>Podés mostrarlo en UI final.</td>
+                  </tr>
+                  <tr>
+                    <td><code>res_finish_second</code></td>
+                    <td><code>INT</code></td>
+                    <td>Segundos transcurridos.</td>
+                    <td>Performance.</td>
+                    <td><code>elapsed = duration - time_left</code>.</td>
+                    <td>Podés mostrarlo o usarlo en ranking.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-info mb-0" role="alert">
+              <div class="fw-semibold mb-1">Sanitización del INSERT</div>
+              Se cargan valores con tipos (<code>"i"</code>/<code>"s"</code>) en <code>InsertQuery</code> (normalmente
+              implica binding/escape en la librería).
+              Si querés robustez extra: <span class="fw-semibold">unique</span> por <code>res_game_id</code> para evitar
+              duplicados por reintentos.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Session model -->
+      <div class="col-12" id="session-model">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Modelo en sesión (lo que vive en $_SESSION durante la partida)</h2>
+          </div>
+          <div class="card-body">
+            <p class="text-secondary mb-3">
+              Esto existe en <code>$_SESSION["connect_words"][gid]</code>. Explica exactamente qué calcula el backend.
+            </p>
+
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Campo</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con Front-end</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>cfg_key</code></td>
+                    <td><code>string</code></td>
+                    <td>Clave del puzzle.</td>
+                    <td>Trazabilidad/analítica.</td>
+                    <td>No llega al FE.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cfg_id</code></td>
+                    <td><code>number</code></td>
+                    <td>ID de config usada.</td>
+                    <td>Persistencia en results.</td>
+                    <td>No llega al FE.</td>
+                  </tr>
+                  <tr>
+                    <td><code>duration</code></td>
+                    <td><code>number</code></td>
+                    <td>Duración total.</td>
+                    <td>Timer server-authoritative.</td>
+                    <td>FE lo recibe como <code>duration</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>start_ts</code></td>
+                    <td><code>number</code></td>
+                    <td>Timestamp inicio.</td>
+                    <td>Calcular <code>time_left</code>.</td>
+                    <td>No llega al FE, pero lo afecta vía <code>time_left</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>board</code></td>
+                    <td><code>array&lt;string&gt;</code></td>
+                    <td>Orden actual del tablero.</td>
+                    <td>Fuente de verdad.</td>
+                    <td>FE lo renderiza; calcula índices por posición.</td>
+                  </tr>
+                  <tr>
+                    <td><code>word_map</code></td>
+                    <td><code>object</code></td>
+                    <td>tileId → palabra.</td>
+                    <td>Mostrar texto.</td>
+                    <td>FE pinta el texto.</td>
+                  </tr>
+                  <tr>
+                    <td><code>group_map</code></td>
+                    <td><code>object</code></td>
+                    <td>tileId → groupKey.</td>
+                    <td>Resolver filas.</td>
+                    <td>FE no lo recibe; lo deduce con groups.</td>
+                  </tr>
+                  <tr>
+                    <td><code>solved_groups</code></td>
+                    <td><code>array&lt;string&gt;</code></td>
+                    <td>Grupos ya resueltos.</td>
+                    <td>Win condition + bloquear swaps.</td>
+                    <td>FE recibe <code>tiles_solved</code> ya expandido.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ended</code></td>
+                    <td><code>0|1</code></td>
+                    <td>Partida terminada.</td>
+                    <td>Cortar acciones.</td>
+                    <td>FE termina por <code>status</code>; BE también corta por este flag.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cols</code> / <code>rows</code></td>
+                    <td><code>number</code></td>
+                    <td>Dimensiones N x N.</td>
+                    <td>Rangos de índices y filas.</td>
+                    <td>FE renderiza filas y calcula filas impactadas.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-secondary mb-0" role="alert">
+              <div class="fw-semibold mb-1">Por qué el win es “solved_groups === cols”</div>
+              Cada fila resuelta corresponde a un grupo. En un tablero NxN hay N grupos, por eso la condición es
+              <code>count(solved_groups) === cols</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- game-start -->
+      <div class="col-12" id="game-start">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center">
+              <div>
+                <h2 class="h5 mb-0"><code>POST ajax/game-start.php</code></h2>
+                <div class="text-secondary small">Crea partida nueva desde DB y devuelve el estado inicial.</div>
+              </div>
+              <span class="badge text-bg-success">Start</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="h6 mb-2">INPUT (Request POST)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Req.</th>
+                    <th>Default</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                    <th>Validación / Sanitización</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>cfg_key</code></td>
+                    <td><code>string</code></td>
+                    <td><span class="badge text-bg-secondary">No</span></td>
+                    <td><code>connect_words</code></td>
+                    <td>Clave para filtrar configs activas.</td>
+                    <td>Elegir familia de puzzles.</td>
+                    <td>FE lo manda al iniciar (<code>IniciarJuego</code>).</td>
+                    <td><code>trim()</code> + filtro en DB con tipado (<code>"s"</code>) +
+                      <code>NoSpecialChars()</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT OK (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                    <th>Garantías / Sanitización</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>success</code></td>
+                    <td><code>0|1</code></td>
+                    <td>Éxito.</td>
+                    <td>Habilita el flujo.</td>
+                    <td>Si 0, FE no arranca.</td>
+                    <td>Controlado por BE.</td>
+                  </tr>
+                  <tr>
+                    <td><code>gid</code></td>
+                    <td><code>string</code></td>
+                    <td>ID de partida.</td>
+                    <td>Identificar sesión.</td>
+                    <td>Se guarda como <code>estado.gid</code>.</td>
+                    <td>Generado aleatorio (hex).</td>
+                  </tr>
+                  <tr>
+                    <td><code>duration</code></td>
+                    <td><code>number</code></td>
+                    <td>Duración total.</td>
+                    <td>Base del timer.</td>
+                    <td><code>estado.initialDuration</code>.</td>
+                    <td>Numérico desde DB.</td>
+                  </tr>
+                  <tr>
+                    <td><code>time_left</code></td>
+                    <td><code>number</code></td>
+                    <td>Tiempo restante inicial.</td>
+                    <td>Sincronía del reloj.</td>
+                    <td>FE setea <code>estado.tiempoRestante</code>.</td>
+                    <td>Clamp a ≥ 0.</td>
+                  </tr>
+                  <tr>
+                    <td><code>word_map</code></td>
+                    <td><code>object</code></td>
+                    <td>tileId → palabra.</td>
+                    <td>Pintar texto.</td>
+                    <td><code>Renderizar()</code> usa <code>estado.wordMap[id]</code>.</td>
+                    <td>FE usa <code>textContent</code> (seguro).</td>
+                  </tr>
+                  <tr>
+                    <td><code>board</code></td>
+                    <td><code>array&lt;string&gt;</code></td>
+                    <td>Orden de tiles.</td>
+                    <td>Layout y swaps.</td>
+                    <td>FE corta por filas según cols.</td>
+                    <td>Longitud N*N garantizada.</td>
+                  </tr>
+                  <tr>
+                    <td><code>tiles_solved</code></td>
+                    <td><code>object&lt;string,0|1&gt;</code></td>
+                    <td>tileId → resuelto.</td>
+                    <td>Bloquear tiles resueltos.</td>
+                    <td>FE aplica <code>.is-solved</code> y filtra drag.</td>
+                    <td>Inicialmente 0.</td>
+                  </tr>
+                  <tr>
+                    <td><code>groups</code></td>
+                    <td><code>array</code></td>
+                    <td>Grupos del puzzle.</td>
+                    <td>Mapping a grupos.</td>
+                    <td>FE deduce groupKey por tile.</td>
+                    <td>Estructura validada.</td>
+                  </tr>
+                  <tr>
+                    <td><code>cols</code> / <code>rows</code></td>
+                    <td><code>number</code></td>
+                    <td>Dimensiones del tablero.</td>
+                    <td>Render.</td>
+                    <td>FE arma estructura con filas y cols.</td>
+                    <td>Controlado por BE (N).</td>
+                  </tr>
+                  <tr>
+                    <td><code>status</code></td>
+                    <td><code>string</code></td>
+                    <td>Estado inicial.</td>
+                    <td>Continuidad.</td>
+                    <td>Si fuera won/lost, FE finaliza.</td>
+                    <td>Controlado.</td>
+                  </tr>
+                  <tr>
+                    <td><code>message</code></td>
+                    <td><code>string</code></td>
+                    <td>Mensaje UI.</td>
+                    <td>Feedback.</td>
+                    <td><code>mensajeEl.textContent</code>.</td>
+                    <td>Controlado.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT ERROR (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Formato</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>{ "success": 0, "error": "NO_CONFIGS" }</code></td>
+                    <td>Informar problema de configuración o data.</td>
+                    <td>FE muestra mensaje y no inicia.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-responsive mt-3">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Cuándo pasa</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="badge text-bg-danger">NO_CONFIGS</span></td>
+                    <td>No hay configs activas para cfg_key.</td>
+                    <td>Indicar falta de puzzle.</td>
+                    <td>FE debería mostrar “No hay configuración activa”.</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge text-bg-danger">RANDOM_FAIL</span></td>
+                    <td>No se pudo elegir random.</td>
+                    <td>Diagnóstico borde.</td>
+                    <td>FE muestra error.</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge text-bg-danger">BAD_CFG_CONTENT</span></td>
+                    <td>cfg_content inválido (estructura o regla N=N).</td>
+                    <td>Evitar partida corrupta.</td>
+                    <td>FE muestra error y conviene loggear.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="fw-semibold mt-4 mb-2">Ejemplo OK</div>
+            <pre class="bg-body border rounded p-3 mb-0"><code>{
+  "success": 1,
+  "gid": "0a1b2c3d4e5f00112233445566778899",
+  "duration": 60,
+  "time_left": 60,
+  "word_map": { "1": "Virus", "2": "Spam" },
+  "board": ["1","2","3","4","5","6","7","8","9"],
+  "tiles_solved": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0, "9": 0 },
+  "groups": [
+    { "key": "riesgos_basicos", "words": ["Virus","Spam","Phishing"] },
+    { "key": "protecciones_basicas", "words": ["Antivirus","Firewall","Backup"] },
+    { "key": "dispositivos_y_wifi", "words": ["Computadora","Celular","Router"] }
+  ],
+  "cols": 3,
+  "rows": 3,
+  "status": "playing",
+  "message": ""
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- action -->
+      <div class="col-12" id="action">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center">
+              <div>
+                <h2 class="h5 mb-0"><code>POST ajax/action.php</code></h2>
+                <div class="text-secondary small">Operaciones: <code>tick</code> y <code>swap</code>.</div>
+              </div>
+              <span class="badge text-bg-primary">Loop</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="h6 mb-2">INPUT (Request POST)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Req.</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                    <th>Validación / Sanitización</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>gid</code></td>
+                    <td><code>string</code></td>
+                    <td><span class="badge text-bg-success">Sí</span></td>
+                    <td>ID de partida.</td>
+                    <td>Encontrar partida en sesión.</td>
+                    <td>FE lo manda siempre.</td>
+                    <td>Debe existir en sesión; si no → <code>BAD_GID</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>op</code></td>
+                    <td><code>string</code></td>
+                    <td><span class="badge text-bg-success">Sí</span></td>
+                    <td><code>tick</code> o <code>swap</code>.</td>
+                    <td>Elegir lógica.</td>
+                    <td>Tick cada 2s; swap al soltar drag.</td>
+                    <td>Whitelist; si no → <code>BAD_OP</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>from</code></td>
+                    <td><code>number</code></td>
+                    <td><span class="badge text-bg-warning">Solo swap</span></td>
+                    <td>Índice origen en board.</td>
+                    <td>Swap.</td>
+                    <td>FE lo calcula buscando tileId en board.</td>
+                    <td><code>int</code> + rango; si no → <code>BAD_INDEX</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>to</code></td>
+                    <td><code>number</code></td>
+                    <td><span class="badge text-bg-warning">Solo swap</span></td>
+                    <td>Índice destino en board.</td>
+                    <td>Swap.</td>
+                    <td>FE lo calcula por tile target.</td>
+                    <td><code>int</code> + rango; si no → <code>BAD_INDEX</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-secondary mb-0" role="alert">
+              <div class="fw-semibold mb-1">Regla de negocio que el backend aplica sí o sí</div>
+              Si el tile origen o destino pertenece a un grupo resuelto, el swap se bloquea (no cambia board).
+              Por eso el FE debe siempre tomar <code>resp.board</code> como verdad.
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT OK (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                    <th>Garantías / Sanitización</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>success</code></td>
+                    <td><code>0|1</code></td>
+                    <td>Éxito.</td>
+                    <td>Saber si se aplicó.</td>
+                    <td>Si 0, FE revierte swap.</td>
+                    <td>Controlado.</td>
+                  </tr>
+                  <tr>
+                    <td><code>status</code></td>
+                    <td><code>string</code></td>
+                    <td><code>playing</code>/<code>won</code>/<code>lost</code>.</td>
+                    <td>Fin del juego.</td>
+                    <td>Si won/lost → FE finaliza y manda game-over.</td>
+                    <td>Lost por tiempo; won por solved_groups.</td>
+                  </tr>
+                  <tr>
+                    <td><code>message</code></td>
+                    <td><code>string</code></td>
+                    <td>Texto corto.</td>
+                    <td>Feedback.</td>
+                    <td><code>mensajeEl.textContent</code>.</td>
+                    <td>Controlado.</td>
+                  </tr>
+                  <tr>
+                    <td><code>time_left</code></td>
+                    <td><code>number</code></td>
+                    <td>Tiempo restante.</td>
+                    <td>Sync timer.</td>
+                    <td>FE lo adopta como verdad.</td>
+                    <td>Clamp.</td>
+                  </tr>
+                  <tr>
+                    <td><code>board</code></td>
+                    <td><code>array&lt;string&gt;</code></td>
+                    <td>Board actualizado.</td>
+                    <td>Layout fuente de verdad.</td>
+                    <td>FE reemplaza y re-renderiza.</td>
+                    <td>Coherente con reglas server.</td>
+                  </tr>
+                  <tr>
+                    <td><code>tiles_solved</code></td>
+                    <td><code>object</code></td>
+                    <td>tileId → 0/1.</td>
+                    <td>Bloqueo/estilo.</td>
+                    <td>FE bloquea drag y pinta solved.</td>
+                    <td>Deriva de solved_groups.</td>
+                  </tr>
+                  <tr>
+                    <td><code>new_solved_ids</code></td>
+                    <td><code>array&lt;string&gt;</code></td>
+                    <td>Tiles resueltos en esta acción.</td>
+                    <td>Animaciones precisas.</td>
+                    <td>Hoy FE no depende; útil para efectos.</td>
+                    <td>Controlado.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT ERROR (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Formato</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>{ "success": 0, "error": "BAD_GID" }</code></td>
+                    <td>Indicar request inválida.</td>
+                    <td>FE debería reiniciar el juego (start) o refrescar.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-responsive mt-3">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Cuándo pasa</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="badge text-bg-danger">BAD_GID</span></td>
+                    <td>gid no existe en sesión.</td>
+                    <td>Evitar operar sin partida.</td>
+                    <td>Recomendado: reiniciar con game-start.</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge text-bg-danger">BAD_INDEX</span></td>
+                    <td>from/to fuera de rango.</td>
+                    <td>Validación defensiva.</td>
+                    <td>FE revierte swap y re-renderiza.</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge text-bg-danger">BAD_OP</span></td>
+                    <td>op inválida.</td>
+                    <td>Contrato inválido.</td>
+                    <td>FE loguea error.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-12 col-lg-6">
+                <div class="fw-semibold mb-2">Ejemplo tick OK</div>
+                <pre class="bg-body border rounded p-3 mb-0"><code>{
+  "success": 1,
+  "status": "playing",
+  "message": "",
+  "time_left": 55,
+  "board": ["1","2","3","4","5","6","7","8","9"],
+  "tiles_solved": {"1":0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,"8":0,"9":0},
+  "new_solved_ids": []
+}</code></pre>
+              </div>
+              <div class="col-12 col-lg-6">
+                <div class="fw-semibold mb-2">Ejemplo swap OK con win</div>
+                <pre class="bg-body border rounded p-3 mb-0"><code>{
+  "success": 1,
+  "status": "won",
+  "message": "Ganaste!",
+  "time_left": 12,
+  "board": ["1","2","3","4","5","6","7","8","9"],
+  "tiles_solved": {"1":1,"2":1,"3":1,"4":1,"5":1,"6":1,"7":1,"8":1,"9":1},
+  "new_solved_ids": ["7","8","9"]
+}</code></pre>
+              </div>
+            </div>
+
+            <div class="alert alert-warning mt-3 mb-0" role="alert">
+              <div class="fw-semibold mb-1">Fin por tiempo</div>
+              Si el servidor detecta <code>time_left &lt;= 0</code> responde <code>lost</code> aunque el timer local del
+              FE todavía no haya llegado a 0.
+              Por eso el tick es importante como “fuente de verdad”.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- game-over -->
+      <div class="col-12" id="game-over">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center">
+              <div>
+                <h2 class="h5 mb-0"><code>POST ajax/game-over.php</code></h2>
+                <div class="text-secondary small">Finaliza y guarda resultado en <code>player_results</code>.</div>
+              </div>
+              <span class="badge text-bg-dark">Finish</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="h6 mb-2">INPUT (Request POST)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Req.</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                    <th>Validación / Sanitización</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>gid</code></td>
+                    <td><code>string</code></td>
+                    <td><span class="badge text-bg-success">Sí</span></td>
+                    <td>ID de partida.</td>
+                    <td>Seleccionar partida a persistir.</td>
+                    <td>FE lo manda una sola vez (flag <code>envioGameOver</code>).</td>
+                    <td>Debe existir en sesión; si no → <code>BAD_GID</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT OK (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                    <th>Garantías / Sanitización</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>success</code></td>
+                    <td><code>0|1</code></td>
+                    <td>Confirmación de insert.</td>
+                    <td>Saber si guardó en DB.</td>
+                    <td>Hoy se loguea; se puede mostrar en UI.</td>
+                    <td>Controlado.</td>
+                  </tr>
+                  <tr>
+                    <td><code>status</code></td>
+                    <td><code>string</code></td>
+                    <td><code>won</code> / <code>lost</code>.</td>
+                    <td>Outcome persistido.</td>
+                    <td>FE ya lo sabe; esto confirma.</td>
+                    <td>Controlado.</td>
+                  </tr>
+                  <tr>
+                    <td><code>points</code></td>
+                    <td><code>number</code></td>
+                    <td>Puntaje final.</td>
+                    <td>Rankings/estadística.</td>
+                    <td>Podés mostrarlo en la pantalla final.</td>
+                    <td><code>solved_groups * 25</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>finish_second</code></td>
+                    <td><code>number</code></td>
+                    <td>Segundos transcurridos.</td>
+                    <td>Performance.</td>
+                    <td>Podés mostrarlo o usarlo para ranking.</td>
+                    <td><code>duration - time_left</code> (clamp).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 class="h6 mt-4 mb-2">OUTPUT ERROR (Response JSON)</h3>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Formato</th>
+                    <th>Para qué sirve</th>
+                    <th>Relación con FE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>{ "success": 0, "error": "BAD_GID" }</code></td>
+                    <td>Indicar que no se pudo guardar (no hay sesión).</td>
+                    <td>FE puede reintentar o reiniciar.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="fw-semibold mt-4 mb-2">Ejemplo OK</div>
+            <pre class="bg-body border rounded p-3 mb-0"><code>{
+  "success": 1,
+  "status": "lost",
+  "points": 25,
+  "finish_second": 60
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flujo FE -->
+      <div class="col-12" id="flow">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Flujo del Front-end (cómo se conectan los endpoints)</h2>
+          </div>
+          <div class="card-body">
+            <ol class="mb-0">
+              <li class="mb-2"><span class="fw-semibold">Start:</span> <code>POST game-start</code> → guarda
+                <code>gid</code>, <code>board</code>, <code>word_map</code>, <code>groups</code>,
+                <code>tiles_solved</code>, <code>cols/rows</code>, <code>time_left</code>.</li>
+              <li class="mb-2"><span class="fw-semibold">Timer UI:</span> el FE usa RAF (suave) para mostrar el
+                countdown y el progress ring.</li>
+              <li class="mb-2"><span class="fw-semibold">Sync:</span> cada 2s → <code>POST action</code> con
+                <code>{ gid, op:"tick" }</code>.</li>
+              <li class="mb-2"><span class="fw-semibold">Swap:</span> al soltar drag → calcula <code>from/to</code> por
+                índice en board y llama <code>POST action</code> con <code>{ gid, op:"swap", from, to }</code>.</li>
+              <li class="mb-2"><span class="fw-semibold">Reconciliación:</span> siempre reemplazar con
+                <code>resp.board</code> y <code>resp.tiles_solved</code> (verdad del servidor).</li>
+              <li><span class="fw-semibold">Finish:</span> si <code>status</code> es <code>won/lost</code> → frena
+                timer/sync, muestra UI final y manda <code>POST game-over</code> una vez.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Casos borde -->
+      <div class="col-12" id="edge-cases">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Casos borde (lo que puede romper o confundir)</h2>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">Desfase del timer</div>
+                    <ul class="mb-0">
+                      <li>BE manda <code>time_left</code> como fuente de verdad.</li>
+                      <li>FE puede “adelantarse/atrasarse” hasta el próximo tick.</li>
+                      <li>BE puede responder <code>lost</code> antes de que el FE llegue a 0 visualmente.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">Palabras duplicadas (normalizadas)</div>
+                    <ul class="mb-0">
+                      <li>El FE usa normalización para mapear palabra → groupKey.</li>
+                      <li>Duplicados pueden romper títulos/estilos de fila resuelta en FE.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">Swap bloqueado por servidor</div>
+                    <ul class="mb-0">
+                      <li>BE bloquea swaps si alguno toca un grupo resuelto.</li>
+                      <li>FE ya filtra, pero igual debe reconciliar con <code>resp.board</code>.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">Game-over duplicado</div>
+                    <ul class="mb-0">
+                      <li>FE usa flag para mandar una vez.</li>
+                      <li>Si querés retry seguro: unique por <code>res_game_id</code> y manejo idempotente.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert alert-info mt-3 mb-0" role="alert">
+              <div class="fw-semibold mb-1">Sugerencia opcional</div>
+              Si querés debug más fácil: agregar <code>server_now</code> o <code>start_ts</code> a las respuestas. No es
+              necesario, pero acelera el diagnóstico de sync/timer.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+            <div class="text-secondary small">
+              Guardalo como <code>documentacion/connect-words.html</code>. Todo es visible en el DOM →
+              <code>Ctrl+F</code> funciona perfecto.
+            </div>
+            <div class="d-flex gap-2">
+              <a class="btn btn-outline-secondary btn-sm" href="#top">Arriba</a>
+              <a class="btn btn-primary btn-sm" href="#db">DB</a>
+              <a class="btn btn-primary btn-sm" href="#game-start">game-start</a>
+              <a class="btn btn-primary btn-sm" href="#action">action</a>
+              <a class="btn btn-primary btn-sm" href="#game-over">game-over</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
