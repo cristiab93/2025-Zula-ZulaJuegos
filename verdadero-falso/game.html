@@ -20,7 +20,7 @@
   <div class="container vh-100 position-relative">
     <div class="row align-items-center justify-content-center vh-100">
       <div class="col-xl-10 text-center">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center mb-4">
           <div class="text-start">
             <div class="bg-gray-200 fit-content px-2 py-1 rounded-2">
               <img src="img/alert.svg" height="17">
@@ -38,7 +38,7 @@
             </svg>
 
             <div class="timer-content">
-              <span class="icon">⌛</span>
+              <span class="icon"><img src="img/clock.gif"></span>
               <span class="time" id="time">01:00</span>
             </div>
           </div>
@@ -51,13 +51,32 @@
            <h3 class="text-black fw-600 mt-3">El CBU identifica de forma única una cuenta bancaria en Argentina.</h3>
            <p class="gray-700">El CBU es el identificador único de 
 cuentas en el sistema argentino.</p>
-            <div class="btn-siguiente fw-600 mt-4 fit-content px-4 rounded-2 py-2">SIGUIENTE</div>
+            <button class="btn btn-siguiente fw-600 mt-4 fit-content px-4 rounded-2 py-2">SIGUIENTE</button>
 
 
           </div>
 
-          <div class="col-12 col-md-6 text-start">
-          
+          <div class="col-12 col-md-6 text-start cards-vf">
+          <div class="row align-items-start">
+          <div class="col-6">
+          <div class="h-100 bg-white verdadero active border rounded-3 text-center">
+          <div class="bg-green card-v rounded-3 m-3 d-flex align-items-center justify-content-center">
+          <h4 class="mb-0 text-white fw-600">V</h4>
+          </div>
+          </div>
+
+          <p class="text-violeta fw-600 text-center bg-white border px-3 py-4 rounded-3 mt-3">CORRECTO!</p>
+          </div>
+
+          <div class="col-6">
+          <div class="h-100 bg-white falso border rounded-3 text-center">
+          <div class="bg-red card-v rounded-3 m-3 d-flex align-items-center justify-content-center">
+          <h4 class="mb-0 text-white fw-600">F</h4>
+          </div>
+          </div>
+           <p class="text-violeta fw-600 text-center bg-white border px-3 py-4 rounded-3 mt-3" hidden>CORRECTO!</p>
+          </div>
+          </div>
           </div>
         </div>
 

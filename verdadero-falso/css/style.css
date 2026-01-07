@@ -99,6 +99,10 @@ body {
     color: #D6630A;
 }
 
+.text-violeta {
+    color: #6610F2;
+}
+
 .bg-violeta {
     background-color: #6610F2;
 }
@@ -214,7 +218,44 @@ body {
   background: #C29FFA;
   border-color: #8540F5;
 }
+.font14
+ {
+    font-size: 14px;
+    line-height: 19px;
+}
 
+.card-v
+ {
+    min-height: 360px; cursor: pointer;
+}
+.cards-vf .verdadero.active
+ {
+    background-color: #BEE8B4 !important;
+    border-color: #25B003 !important;
+}
+.cards-vf .falso.active
+ {
+    background-color: #FABCB3 !important;
+    border-color: #FA3B1D !important;
+}
+
+.card-v h4 {font-size: 65px;}
+
+.bg-green {background-color: #51C035;}
+.bg-red {background-color: #FB624A;}
+
+.wh-45 {
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    line-height: 45px;
+}
+.wh-35 {
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+}
 .circle.success {
   background: #90D67F;
   border-color: #25B003;

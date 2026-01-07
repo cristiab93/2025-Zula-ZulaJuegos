@@ -10,8 +10,19 @@ body {
 }
 
 .btn-primary {background-color: #3874FF;}
+.wh-45 {
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    line-height: 45px;
+}
 
 /* CONNECT WORDS */
+
+.px-5rem {
+    padding-right: 5rem !important;
+    padding-left: 5rem !important;
+}
 .cards-ob .card {
     min-height: 190px;
 }
