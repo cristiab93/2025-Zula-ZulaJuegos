@@ -7,14 +7,14 @@ if($_SERVER['HTTP_HOST'] == 'localhost:82' || $_SERVER['HTTP_HOST'] == 'localhos
 	define("DBPASSWORD", "511xpWgxUR4icML4");
 	define("DBNAME", "zula_juegos");
 	define("DEPURAR", 0);
-	define("BASEURL", "http://localhost/zula_juegos/trivia/");
+	define("BASEURL", "http://localhost/zula_juegos/connect_words/");
 }
 else
 {
-    /*define("DBSERVERNAME", "localhost");
-	define("DBUSERNAME", "c2110196_sk");
-	define("DBPASSWORD", "poGEve59wi");
-	define("DBNAME", "c2110196_sk");
+    define("DBSERVERNAME", "localhost");
+	define("DBUSERNAME", "a0050875_testing");
+	define("DBPASSWORD", "luriPUgi41");
+	define("DBNAME", "a0050875_testing");
 	define("DEPURAR", 0);
-	define("BASEURL", "https://somoskahlo.com");*/
+	define("BASEURL", "https://a0050875.ferozo.com/");
 }

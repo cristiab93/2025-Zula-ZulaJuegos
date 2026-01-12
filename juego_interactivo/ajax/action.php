@@ -36,6 +36,18 @@ function TiempoRestante($s)
   return $restante;
 }
 
+function GuardarResultado($s, $gid, $outcome, $finishSecond, $points)
+{
+  $ins = InsertQuery("player_results");
+  $ins->Value("res_game_config_id", "i", (int)$s["cfg_id"]);
+  $ins->Value("res_player_id", "i", 0); // No hay sistema de usuarios por ahora
+  $ins->Value("res_game_id", "s", $gid);
+  $ins->Value("res_outcome", "s", $outcome);
+  $ins->Value("res_points", "i", $points);
+  $ins->Value("res_finish_second", "i", $finishSecond);
+  return $ins->Run();
+}
+
 $gid = ValidarGid();
 if (!$gid) {
   $resp = ["success" => 0, "error" => "BAD_GID"];
@@ -93,6 +105,67 @@ if ($op === "check_answer") {
     "correctIndex" => $correctIndex,
     "points" => $points,
     "explanation" => $explanation
+  ];
+  goto RESPOND;
+}
+
+if ($op === "submit_all_answers") {
+  $userAnswers = json_decode(ObtenerParam("answers", "{}"), true);
+  if (!$userAnswers) {
+    $resp = ["success" => 0, "error" => "INVALID_ANSWERS_FORMAT"];
+    goto RESPOND;
+  }
+
+  $details = [];
+  $totalScore = 0;
+  $correctCount = 0;
+  $totalQuestions = 0;
+
+  foreach ($s["instances"] as $idx => $inst) {
+    if ($inst["type"] !== "question") continue;
+
+    $totalQuestions++;
+    $selected = isset($userAnswers[$idx]) ? (int)$userAnswers[$idx] : -1;
+    $correctIndex = (int)$inst["correct"];
+    $isCorrect = ($selected === $correctIndex);
+    $points = $isCorrect ? (int)($inst["points"] ?? 10) : 0;
+    $explanation = $inst["explanation"] ?? "";
+
+    if ($isCorrect) {
+      $correctCount++;
+      $totalScore += $points;
+    }
+
+    $details[$idx] = [
+      "index" => (int)$idx,
+      "selected" => $selected,
+      "correctIndex" => $correctIndex,
+      "isCorrect" => $isCorrect,
+      "points" => $points,
+      "explanation" => $explanation
+    ];
+  }
+
+  // Guardar el detalle en sesión
+  $s["user_answers_detail"] = $details;
+  $s["total_score"] = $totalScore;
+  $s["correct_count"] = $correctCount;
+  $s["total_questions"] = $totalQuestions;
+  $s["ended"] = 1; // Marcar como finalizado
+
+  // Guardar resultado en DB final una sola vez
+  $timeLeft = TiempoRestante($s);
+  $elapsed = (int)$s["duration"] - $timeLeft;
+  if ($elapsed < 0) $elapsed = 0;
+  
+  GuardarResultado($s, $gid, "finished", $elapsed, $totalScore);
+
+  $resp = [
+    "success" => 1,
+    "totalScore" => $totalScore,
+    "correctCount" => $correctCount,
+    "totalQuestions" => $totalQuestions,
+    "details" => $details
   ];
   goto RESPOND;
 }
