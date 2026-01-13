@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zula</title>
@@ -19,18 +19,19 @@
 <body>
 
     <div class="container vh-100 position-relative">
-        <div class="row align-items-center justify-content-center vh-100">
+        <div class="row align-items-start justify-content-center vh-100">
             <div class="col-12">
-               
 
-                <!-- TITULAR -->
 
-                <h2 class="fw-700 text-black" id="main-title" style="display:none;">¿Qué es el Phishing?</h2>
+                <!-- TITULAR 
+
+                <h2 class="fw-700 text-black" id="main-title" style="display:none;">¿Qué es el Phishing?</h2>-->
 
                 <!-- TEXTO + IMAGEN -->
 
-                <div class="row trivia-screen" id="screen-text-image" style="display:none;">
+                <div class="row trivia-screen align-items-start" id="screen-text-image" style="display:none;">
                     <div class="col-12 col-lg-6 mt-4" id="text-image-content">
+                        <h2 class="fw-700 text-black" id="main-title">¿Qué es el Phishing?</h2>
                         <!-- Content will be injected here -->
                     </div>
                     <div class="col-12 col-lg-6 mt-4">
@@ -42,7 +43,7 @@
 
                 <!-- IMAGEN + TEXTO -->
 
-                <div class="row trivia-screen" id="screen-image-text" style="display:none;">
+                <div class="row trivia-screen align-items-start" id="screen-image-text" style="display:none;">
                     <div class="col-12 col-lg-6 mt-4">
                         <div class="background-img rounded-4" id="image-text-img"
                             style="background-image: url(img/img.jpg);"></div>
@@ -55,7 +56,7 @@
 
                 <!-- TEXTO + VIDEO YOUTUBE -->
 
-                <div class="row trivia-screen" id="screen-text-video" style="display:none;">
+                <div class="row trivia-screen align-items-start" id="screen-text-video" style="display:none;">
                     <div class="col-12 col-lg-6 mt-4" id="text-video-content">
                         <!-- Content will be injected here -->
                     </div>
@@ -78,7 +79,7 @@
 
                 <!-- 100% TEXTO -->
 
-                <div class="row trivia-screen" id="screen-only-text" style="display:none;">
+                <div class="row trivia-screen align-items-start" id="screen-only-text" style="display:none;">
                     <div class="col-12 mt-4" id="only-text-content">
                         <!-- Content will be injected here -->
                     </div>
@@ -86,7 +87,7 @@
 
                 <!-- 100% IMAGEN -->
 
-                <div class="row trivia-screen" id="screen-only-image" style="display:none;">
+                <div class="row trivia-screen align-items-start" id="screen-only-image" style="display:none;">
                     <div class="col-12 mt-4">
                         <img id="only-image-src" src="" class="img-fluid">
                     </div>
@@ -97,9 +98,7 @@
                     style="display:none;">
                     <div class="col-10 col-lg-10 text-center">
                         <div class="fit-content bg-orange-300 p-2 d-flex align-items-center mx-auto mb-4 rounded-3">
-                            <div class="bg-orange-100 wh-45 rounded-3">
-                                <img src="img/preguntas.svg">
-                            </div>
+                           
                             <p class="text-orange ms-3 mb-0 fw-600 pe-2 font14">BLOQUE PREGUNTAS</p>
                         </div>
                         <h1 class="mb-3 fw-700 text-black" id="intro-trivia-title">Pon a prueba lo aprendido</h1>
@@ -109,46 +108,52 @@
                     </div>
                     <div class="col-12 col-md-4 col-xl-3 mt-4">
                         <div class="card rounded-4">
-                            <div class="card-body p-4">
-                                <div class="bg-orange-100 wh-45 rounded-3 mb-3">
+                            <div class="card-body p-4 d-flex align-items-center">
+                                <div class="bg-orange-100 wh-45 rounded-3 me-3">
                                     <img src="img/preguntas.svg">
                                 </div>
-                                <h3 class="fw-700 text-black">3 Preguntas</h3>
-                                <p class="mb-0 text-black font14">Opción múltiple con una sola respuesta correcta</p>
+                                <div>
+                                <h3 class="fw-700 text-black font14 mb-1">3 Preguntas</h3>
+                                <p class="mb-0 text-black font12">Opción múltiple con una sola respuesta correcta</p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-12 col-md-4 col-xl-3 mt-4">
                         <div class="card rounded-4">
-                            <div class="card-body p-4">
-                                <div class="bg-orange-100 wh-45 rounded-3 mb-3">
+                            <div class="card-body p-4 d-flex align-items-center">
+                                <div class="bg-orange-100 wh-45 rounded-3 me-3">
                                     <img src="img/feedback.svg">
                                 </div>
-                                <h3 class="fw-700 text-black">Feedback inmediato</h3>
-                                <p class="mb-0 text-black font14">Sabrás al instante si acertaste</p>
+                                <div>
+                                <h3 class="fw-700 text-black font14 mb-1">Feedback inmediato</h3>
+                                <p class="mb-0 text-black font12">Sabrás al instante si acertaste</p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-12 col-md-4 col-xl-3 mt-4">
                         <div class="card rounded-4">
-                            <div class="card-body p-4">
-                                <div class="bg-orange-100 wh-45 rounded-3 mb-3">
+                            <div class="card-body p-4 d-flex align-items-center">
+                                <div class="bg-orange-100 wh-45 rounded-3 me-3">
                                     <img src="img/time.svg">
                                 </div>
-                                <h3 class="fw-700 text-black">Sin límite de tiempo</h3>
-                                <p class="mb-0 text-black font14">Tómate el tiempo que necesites</p>
+                                <div>
+                                <h3 class="fw-700 text-black font14 mb-1">Sin límite de tiempo</h3>
+                                <p class="mb-0 text-black font12">Tómate el tiempo que necesites</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- BLOQUE PREGUNTAS 1 -->
-                <div class="row trivia-screen" id="screen-question" style="display:none;">
+                <div class="row trivia-screen mt-4" id="screen-question" style="display:none;">
                     <h2 class="fw-700 text-black text-center" id="question-text">¿Cuál de estas es una señal de alerta
                         de phishing?</h2>
-                    <div class="d-flex justify-content-center flex-column col-lg-8 col-xl-7 mx-auto mt-5"
+                    <div class="d-flex justify-content-center flex-column col-lg-8 col-xl-7 mx-auto"
                         id="options-container">
                         <!-- Options will be injected here -->
                     </div>
@@ -159,14 +164,14 @@
 
                 <div class="row justify-content-center trivia-screen" id="screen-results" style="display:none;">
                     <div class="col-10 col-lg-10 text-center">
-                        <div class="fit-content bg-orange-300 p-2 d-flex align-items-center mx-auto mb-4 rounded-3">
-                            <div class="bg-orange-100 wh-45 rounded-3">
+                        <div class="fit-content bg-orange-300 p-2 d-flex align-items-center mx-auto my-4 rounded-3">
+                            <!--<div class="bg-orange-100 wh-45 rounded-3">
                                 <img src="img/preguntas.svg">
-                            </div>
+                            </div>-->
                             <p class="text-orange ms-3 mb-0 fw-600 pe-2 font14">RESULTADOS PREGUNTAS</p>
                         </div>
                         <h1 class="mb-1 fw-700 text-black font18" id="results-score">Sumaste 10 puntos</h1>
-                        <p class="gray-700 font11" id="results-summary">Respondiste 1 de 3</p>
+                        <p class="gray-700 font11 mb-0" id="results-summary">Respondiste 1 de 3</p>
                     </div>
                     <div class="row justify-content-center mt-2" id="results-cards-container">
                         <!-- Result cards will be injected here -->
@@ -185,9 +190,9 @@
                 <div class="d-flex justify-content-between align-items-center" id="nav-standard">
                     <a href="javascript:void(0)" class="btn fw-600 btn-primary-outline px-3 py-2 font12"
                         id="btn-prev"><img src="img/arrow-left.svg" class="me-2"> Anterior </a>
-                         <div class="card rounded-1 fit-content px-2 bg-subtle">
-                    <p class="font10 mb-0 fw-500 pb-0" id="progress-counter">1/20</p>
-                </div>
+                    <div class="card rounded-1 fit-content px-2 bg-subtle">
+                        <p class="font10 mb-0 fw-500 pb-0" id="progress-counter">1/20</p>
+                    </div>
                     <a href="javascript:void(0)" class="btn fw-600 btn-primary px-3 py-2 font12" id="btn-next">Continuar
                         <img src="img/arrow.svg" height="11" class="ms-2"> </a>
                 </div>

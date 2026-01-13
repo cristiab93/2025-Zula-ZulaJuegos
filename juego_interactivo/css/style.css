@@ -10,7 +10,8 @@ body {
 }
 
 p {
-    font-size: 13px;
+    font-size: 14px;
+    line-height: 23px;
 }
 
 .steps-slider {
@@ -54,7 +55,7 @@ p {
 
 .step-card {
     width: 135px;
-    height: 90px;
+    height: 65px;
     border-radius: 10px;
     text-align: center;
     padding: 10px;
@@ -70,6 +71,7 @@ p {
 
 .step-card p {
     font-size: 11px;
+    line-height: 15px;
     margin-bottom: 0;
     color: #8A94AD;
     transition: color 0.3s ease;
@@ -208,20 +210,24 @@ p {
 }
 
 .font12 {
-    font-size: 12px;
+    font-size: 12px; line-height: 17px;
 }
 
 .font11 {
-    font-size: 11px;
+    font-size: 11px; line-height: 17px;
 }
 
 .font10 {
-    font-size: 11px;
-    padding: 3px 8px;
+    font-size: 10px;
 }
 
 h3 {
     font-size: 18px;
+}
+
+li {
+    font-size: 14px;
+    line-height: 23px;
 }
 
 .h1,
@@ -244,8 +250,8 @@ h2 {
 }
 
 .wh-45 {
-    width: 45px;
-    height: 45px;
+    min-width: 45px;
+    min-height: 45px;
     text-align: center;
     line-height: 45px;
 }

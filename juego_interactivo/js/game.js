@@ -343,18 +343,18 @@ function RenderResults(data) {
                         <div class="card-body p-3">
                             <div class="d-flex align-items-center">
                                 <img src="img/${isWin ? 'ok.svg' : 'error.svg'}" height="35">
-                                <p class="mb-0 ms-3 font14">${inst.question}</p>
+                                <p class="mb-0 ms-3 font12">${inst.question}</p>
                             </div>
                             <hr>
-                            <div class="card rounded-2 p-3 bg-subtle mt-2">
+                            <div class="card rounded-2 px-3 py-2 bg-subtle mt-2">
                                 <p class="font10 mb-0 fw-500 text-grey-500 text-uppercase">Tu respuesta</p>
-                                <p class="text-black mb-0 fw-600 lh-sm">${detail.selected !== -1 ? inst.options[detail.selected] : 'No respondida'}</p>
+                                <p class="text-black mb-0 fw-600 font13 lh-sm">${detail.selected !== -1 ? inst.options[detail.selected] : 'No respondida'}</p>
                             </div>
-                            <div class="d-flex align-items-center mt-3 bg-${isWin ? 'green' : 'red'}-100 fit-content rounded-2 p-2">
-                                <img src="img/${isWin ? 'explicacion-ok.svg' : 'explicacion.svg'}" height="21">
-                                <p class="mb-0 fw-600 ms-2 font11 text-${isWin ? 'green' : 'red'}-700 lh-sm">${isWin ? 'Tip de Seguridad' : 'Explicación'}</p>
-                            </div>
-                            <p class="mb-0 text-black font11 mt-3">${detail.explanation}</p>
+                            
+                                
+                                <p class="mb-0 fw-600 mt-3 font11 text-${isWin ? 'green' : 'red'}-700 lh-sm">${isWin ? 'Tip de Seguridad' : 'Explicación'}</p>
+                           
+                            <p class="mb-0 text-black font11 mt-2">${detail.explanation}</p>
                         </div>
                     </div>
                 `;
