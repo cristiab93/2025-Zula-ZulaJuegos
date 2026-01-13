@@ -1,0 +1,409 @@
+<!-------------------------------- contenido -------------------------------->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zula</title>
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    
+</head>
+<body>
+<div class="container vh-100 position-relative">
+  <div class="row align-items-start justify-content-center vh-100">
+    <div class="col-12">
+      <!-- TITULAR -->
+      <!-- TEXTO + IMAGEN -->
+      <div class="row trivia-screen animate-in align-items-start" id="screen-text-image" style="display: flex !important;">
+        <div class="col-12 col-lg-6 mt-4 pe-5" id="text-image-content">
+          <h2 class="fw-700 text-black" id="main-title" style="display: block;margin-bottom: 1.5rem;">¿Qué es la Ciberseguridad?</h2>
+          <p class="font14">La ciberseguridad es la práctica de proteger sistemas informáticos, redes, programas y datos contra ataques digitales, daños o accesos no autorizados, asegurando la Confidencialidad, Integridad y Disponibilidad de la información, a través de procesos, tecnologías y buenas prácticas de los usuarios para defender activos digitales en un entorno cada vez más conectado. </p>
+          <p class="font14">Aunque las aplicaciones de seguridad y los dispositivos, como el software antimalware y los firewalls, son esenciales, no basta con conectar esas herramientas y darlo por hecho. La seguridad digital también requiere que se establezca un conjunto de procesos y procedimientos adecuados.</p>
+          <p class="font14">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        </div>
+        <div class="col-12 col-lg-6 mt-4">
+          <div class="background-img rounded-4" id="text-image-img" style="background-image: url(img/img.jpg); min-height: 350px;"></div>
+        </div>
+      </div>
+      <!-- IMAGEN + TEXTO -->
+      <div class="row trivia-screen" id="screen-image-text" style="display: none !important;">
+        <div class="col-12 col-lg-6 mt-4">
+          <div class="background-img rounded-4" id="image-text-img" style="background-image: url(img/img.jpg); min-height: 350px;"></div>
+        </div>
+        <div class="col-12 col-lg-6 mt-4" id="image-text-content">
+          <!-- Content will be injected here -->
+        </div>
+      </div>
+      <!-- TEXTO + VIDEO YOUTUBE -->
+      <div class="row trivia-screen" id="screen-text-video" style="display: none !important;">
+        <div class="col-12 col-lg-6 mt-4" id="text-video-content">
+          <!-- Content will be injected here -->
+        </div>
+        <div id="video-container" class="col-12 col-lg-6 mt-4 position-relative d-flex align-items-center justify-content-center rounded-4" style="min-height: 250px; background: #fdfdfd; border: 2px dashed #e0e0e0;">
+          <div id="video-loader" class="spinner-border text-primary" role="status" style="position: absolute; z-index: 10;">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <div id="video-play-btn" class="wh-65 rounded-circle bg-primary d-flex align-items-center justify-content-center cursor-pointer position-absolute" style="z-index: 15; display: none !important;">
+            <img src="img/play.svg" height="25" class="ms-1">
+          </div>
+          <video id="text-video-src" src="" class="rounded-4 w-100" controls="" controlslist="nodownload" style="display: none;"></video>
+        </div>
+      </div>
+      <!-- 100% TEXTO -->
+      <div class="row trivia-screen" id="screen-only-text" style="display: none !important;">
+        <div class="col-12 mt-4" id="only-text-content">
+          <!-- Content will be injected here -->
+        </div>
+      </div>
+      <!-- 100% IMAGEN -->
+      <div class="row trivia-screen" id="screen-only-image" style="display: none !important;">
+        <div class="col-12 mt-4">
+          <img id="only-image-src" src="" class="img-fluid">
+        </div>
+      </div>
+      <!-- BLOQUE PREGUNTAS -->
+      <div class="row justify-content-center cards-ob trivia-screen" id="screen-intro-trivia" style="display: none !important;">
+        <div class="col-10 col-lg-10 text-center">
+          <div class="fit-content bg-orange-300 p-2 d-flex align-items-center mx-auto mb-4 rounded-3">
+            <div class="bg-orange-100 wh-45 rounded-3">
+              <img src="img/preguntas.svg">
+            </div>
+            <p class="text-orange ms-3 mb-0 fw-600 pe-2 font14">BLOQUE PREGUNTAS</p>
+          </div>
+          <h1 class="mb-3 fw-700 text-black" id="intro-trivia-title">Pon a prueba lo aprendido</h1>
+          <p class="gray-700 font14" id="intro-trivia-desc">Responde las siguientes preguntas de la trivia
+            y sumá puntos. <br>
+            Recibirás feedback inmediato y tips de refuerzo después de cada respuesta.</p>
+        </div>
+        <div class="col-12 col-md-4 col-xl-3 mt-4">
+          <div class="card rounded-4">
+            <div class="card-body p-4">
+              <div class="bg-orange-100 wh-45 rounded-3 mb-3">
+                <img src="img/preguntas.svg">
+              </div>
+              <h3 class="fw-700 text-black">3 Preguntas</h3>
+              <p class="mb-0 text-black font14">Opción múltiple con una sola respuesta correcta</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4 col-xl-3 mt-4">
+          <div class="card rounded-4">
+            <div class="card-body p-4">
+              <div class="bg-orange-100 wh-45 rounded-3 mb-3">
+                <img src="img/feedback.svg">
+              </div>
+              <h3 class="fw-700 text-black">Feedback inmediato</h3>
+              <p class="mb-0 text-black font14">Sabrás al instante si acertaste</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4 col-xl-3 mt-4">
+          <div class="card rounded-4">
+            <div class="card-body p-4">
+              <div class="bg-orange-100 wh-45 rounded-3 mb-3">
+                <img src="img/time.svg">
+              </div>
+              <h3 class="fw-700 text-black">Sin límite de tiempo</h3>
+              <p class="mb-0 text-black font14">Tómate el tiempo que necesites</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- BLOQUE PREGUNTAS 1 -->
+      <div class="row trivia-screen" id="screen-question" style="display: none !important;">
+        <h2 class="fw-700 text-black text-center" id="question-text">¿Cuál de estas es una señal de alerta
+          de phishing?</h2>
+        <div class="d-flex justify-content-center flex-column col-lg-8 col-xl-7 mx-auto mt-5" id="options-container">
+          <!-- Options will be injected here -->
+        </div>
+      </div>
+      <!-- BLOQUE RESULTADOS PREGUNTAS -->
+      <div class="row justify-content-center trivia-screen" id="screen-results" style="display: none !important;">
+        <div class="col-10 col-lg-10 text-center">
+          <div class="fit-content bg-orange-300 p-2 d-flex align-items-center mx-auto mb-4 rounded-3">
+            <div class="bg-orange-100 wh-45 rounded-3">
+              <img src="img/preguntas.svg">
+            </div>
+            <p class="text-orange ms-3 mb-0 fw-600 pe-2 font14">RESULTADOS PREGUNTAS</p>
+          </div>
+          <h1 class="mb-1 fw-700 text-black font18" id="results-score">Sumaste 10 puntos</h1>
+          <p class="gray-700 font11" id="results-summary">Respondiste 1 de 3</p>
+        </div>
+        <div class="row justify-content-center mt-2" id="results-cards-container">
+          <!-- Result cards will be injected here -->
+        </div>
+      </div>
+      <hr>
+      <div>
+        <!-- BOTÓN FINALIZAR ACTIVIDAD -->
+        <div class="d-flex justify-content-center align-items-center d-none" id="nav-finish" style="display: none !important;">
+          <a href="#" class="btn fw-600 btn-primary px-3 py-2 font12" id="btn-finish">Finalizar actividad <img src="img/arrow.svg" height="11" class="ms-2"> </a>
+        </div>
+        <div class="d-flex justify-content-between align-items-start" id="nav-standard">
+          <a href="javascript:void(0)" class="btn fw-600 btn-primary-outline px-3 py-2 font12" id="btn-prev" style="/* visibility: hidden; */"><img src="img/arrow-left.svg" class="me-2"> Anterior </a>
+          <div class="d-flex justify-content-between ">
+            <div class="card rounded-1 fit-content ms-auto px-2 bg-subtle mt-2">
+              <p class="font10 mb-0 fw-500" id="progress-counter">1/9</p>
+            </div>
+          </div>
+          <a href="javascript:void(0)" class="btn fw-600 btn-primary px-3 py-2 font12" id="btn-next" style="pointer-events: auto; opacity: 1;">Continuar
+            <img src="img/arrow.svg" height="11" class="ms-2"> </a>
+        </div>
+      </div>
+      <hr>
+      <div class="steps-slider slick-initialized slick-slider" id="steps-slider-container">
+        <div class="slick-list draggable">
+          <div class="slick-track" style="opacity: 1; width: 1116px; transform: translate3d(0px, 0px, 0px);">
+            <div class="step-card slick-slide slick-current slick-active active" data-slick-index="0" aria-hidden="false" style="width: 120px; height: 65px; background: #8540F5;" tabindex="0">
+              <p class="mb-0 fw-500" style="color: #ffffff;">1. Introducción</p>
+            </div>
+            <div class="step-card slick-slide slick-active locked" data-slick-index="1" aria-hidden="false" style="width: 120px; height: 65px;" tabindex="0">
+              <p class="mb-0">2. Amenazas</p>
+            </div>
+            <div class="step-card slick-slide slick-active locked" data-slick-index="2" aria-hidden="false" style="width: 120px; height: 65px;" tabindex="0">
+              <p class="mb-0">3. Video Tutorial</p>
+            </div>
+            <div class="step-card slick-slide slick-active locked" data-slick-index="3" aria-hidden="false" style="width: 120px; height: 65px;" tabindex="0">
+              <p class="mb-0">4. Resumen</p>
+            </div>
+            <div class="step-card slick-slide slick-active locked" data-slick-index="4" aria-hidden="false" style="width: 120px; height: 65px;" tabindex="0">
+              <p class="mb-0">5. Imagen</p>
+            </div>
+            <div class="step-card slick-slide slick-active locked" data-slick-index="5" aria-hidden="false" style="width: 120px; height: 65px;" tabindex="0">
+              <p class="mb-0">6. Intro Trivia</p>
+            </div>
+            <div class="step-card slick-slide slick-active locked" data-slick-index="6" aria-hidden="false" style="width: 120px; height: 65px;" tabindex="0">
+              <p class="mb-0">7. Pregunta</p>
+            </div>
+            <div class="step-card slick-slide slick-active locked" data-slick-index="7" aria-hidden="false" style="width: 120px; height: 65px;" tabindex="0">
+              <p class="mb-0">8. Pregunta</p>
+            </div>
+            <div class="step-card slick-slide slick-active locked" data-slick-index="8" aria-hidden="false" style="width: 120px; height: 65px;" tabindex="0">
+              <p class="mb-0">9. Resultados</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-------------------------------- preguntas inicio -------------------------------->
+<div class="container vh-100 position-relative">
+  <div class="row align-items-start justify-content-center vh-100">
+    <div class="col-12">
+      <!-- TITULAR -->
+      <!-- TEXTO + IMAGEN -->
+      <div class="row trivia-screen animate-in" id="screen-text-image" style="display: none !important;">
+        <div class="col-12 col-lg-6 mt-4" id="text-image-content">
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+          <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        </div>
+        <div class="col-12 col-lg-6 mt-4">
+          <div class="background-img rounded-4" id="text-image-img" style="background-image: url(img/img.jpg);"></div>
+        </div>
+      </div>
+      <!-- IMAGEN + TEXTO -->
+      <div class="row trivia-screen animate-in" id="screen-image-text" style="display: none !important;">
+        <div class="col-12 col-lg-6 mt-4">
+          <div class="background-img rounded-4" id="image-text-img" style="background-image: url(&quot;img/img-2.jpg&quot;);"></div>
+        </div>
+        <div class="col-12 col-lg-6 mt-4" id="image-text-content">
+          <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+          <ul>
+            <li>Phishing</li>
+            <li>Malware</li>
+            <li>Ransomware</li>
+          </ul>
+        </div>
+      </div>
+      <!-- TEXTO + VIDEO YOUTUBE -->
+      <div class="row trivia-screen animate-in" id="screen-text-video" style="display: none !important;">
+        <div class="col-12 col-lg-6 mt-4" id="text-video-content">
+          <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+        <div id="video-container" class="col-12 col-lg-6 mt-4 position-relative d-flex align-items-center justify-content-center rounded-4" style="min-height: 250px; background: transparent; border: none;">
+          <div id="video-loader" class="spinner-border text-primary" role="status" style="position: absolute; z-index: 10; display: none;">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <div id="video-play-btn" class="wh-65 rounded-circle bg-primary d-flex align-items-center justify-content-center cursor-pointer position-absolute" style="z-index: 15; display: none !important;">
+            <img src="img/play.svg" height="25" class="ms-1">
+          </div>
+          <video id="text-video-src" src="https://web.dev/static/articles/video-and-source-tags/video/web-dev-assets/video-and-source-tags/chrome.webm?hl=es-419" class="rounded-4 w-100" controls="" controlslist="nodownload" style="display: block;"></video>
+        </div>
+      </div>
+      <!-- 100% TEXTO -->
+      <div class="row trivia-screen animate-in" id="screen-only-text" style="display: none !important;">
+        <div class="col-12 mt-4" id="only-text-content">
+          <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+        </div>
+      </div>
+      <!-- 100% IMAGEN -->
+      <div class="row trivia-screen animate-in" id="screen-only-image" style="display: none !important;">
+        <div class="col-12 mt-4">
+          <img id="only-image-src" src="img/img-2.jpg" class="img-fluid">
+        </div>
+      </div>
+      <!-- BLOQUE PREGUNTAS -->
+      <div class="row justify-content-center cards-ob trivia-screen animate-in" id="screen-intro-trivia" style="display: flex !important;">
+        <div class="col-10 col-lg-10 text-center">
+          <div class="fit-content bg-orange-300 p-2 d-flex align-items-center mx-auto mb-4 rounded-3">
+            <p class="text-orange mb-0 fw-600 px-2 font14">BLOQUE PREGUNTAS</p>
+          </div>
+          <h1 class="mb-2 fw-700 text-black" id="intro-trivia-title">¡Es hora de la Trivia!</h1>
+          <p class="gray-700 font14" id="intro-trivia-desc">Demuestra lo que has aprendido en las secciones anteriores.</p>
+        </div>
+        <div class="col-12 col-md-4 col-xl-3">
+          <div class="card rounded-4">
+            <div class="card-body p-4" style="">
+              <div class="bg-orange-100 wh-45 rounded-3 align-items-center justify-content-center me-3" style="
+    display: flex;
+    width: 68px;
+">
+                <img src="img/preguntas.svg" style="">
+              </div>
+              <div style="
+">
+                <h3 class="fw-700 text-black font14 mb-0">3 Preguntas</h3>
+                <p class="mb-0 ps-0 text-black font12">Opción múltiple con una sola respuesta correcta</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4 col-xl-3">
+          <div class="card rounded-4">
+            <div class="card-body p-4">
+              <div class="bg-orange-100 wh-45 rounded-3 align-items-center flex justify-content-center me-3" style="
+    display: flex;
+">
+                <img src="img/feedback.svg">
+              </div>
+              <div class="pt-1">
+                <h3 class="fw-700 text-black font14 mb-0">Feedback inmediato</h3>
+                <p class="mb-0 ps-0 text-black font12">Sabrás al instante si acertaste</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4 col-xl-3">
+          <div class="card rounded-4">
+            <div class="card-body p-4">
+              <div class="bg-orange-100 wh-45 rounded-3 align-items-center justify-content-center me-3" style="
+    display: flex;
+">
+                <img src="img/time.svg">
+              </div>
+              <div class="pt-1">
+                <h3 class="fw-700 text-black font14 mb-0">Sin límite de tiempo</h3>
+                <p class="mb-0 ps-0 text-black font12">Tómate el tiempo que necesites</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- BLOQUE PREGUNTAS 1 -->
+      <div class="row trivia-screen" id="screen-question" style="display: none !important;">
+        <h2 class="fw-700 text-black text-center" id="question-text">¿Cuál de estas es una señal de alerta
+          de phishing?</h2>
+        <div class="d-flex justify-content-center flex-column col-lg-8 col-xl-7 mx-auto mt-5" id="options-container">
+          <!-- Options will be injected here -->
+        </div>
+      </div>
+      <!-- BLOQUE RESULTADOS PREGUNTAS -->
+      <div class="row justify-content-center trivia-screen" id="screen-results" style="display: none !important;">
+        <div class="col-10 col-lg-10 text-center">
+          <div class="fit-content bg-orange-300 p-2 d-flex align-items-center mx-auto mb-4 rounded-3">
+            <div class="bg-orange-100 wh-45 rounded-3">
+              <img src="img/preguntas.svg">
+            </div>
+            <p class="text-orange ms-3 mb-0 fw-600 pe-2 font14">RESULTADOS PREGUNTAS</p>
+          </div>
+          <h1 class="mb-1 fw-700 text-black font18" id="results-score">Sumaste 10 puntos</h1>
+          <p class="gray-700 font11" id="results-summary">Respondiste 1 de 3</p>
+        </div>
+        <div class="row justify-content-center mt-2" id="results-cards-container">
+          <!-- Result cards will be injected here -->
+        </div>
+      </div>
+      <hr>
+      <!-- BOTÓN FINALIZAR ACTIVIDAD -->
+      <div class="d-flex justify-content-center align-items-center d-none" id="nav-finish" style="display: none !important;">
+        <a href="#" class="btn fw-600 btn-primary px-3 py-2 font12" id="btn-finish">Finalizar actividad <img src="img/arrow.svg" height="11" class="ms-2"> </a>
+      </div>
+      <div class="d-flex justify-content-between align-items-center" id="nav-standard">
+        <a href="javascript:void(0)" class="btn fw-600 btn-primary-outline px-3 py-2 font12" id="btn-prev" style="/* visibility: hidden; */"><img src="img/arrow-left.svg" class="me-2"> Anterior </a>
+        <div class="d-flex justify-content-between ">
+          <div class="card rounded-1 fit-content ms-auto px-2 bg-subtle mt-2">
+            <p class="font10 mb-0 fw-500" id="progress-counter">6/9</p>
+          </div>
+        </div>
+        <a href="javascript:void(0)" class="btn fw-600 btn-primary px-3 py-2 font12" id="btn-next" style="pointer-events: auto; opacity: 1;">Continuar
+          <img src="img/arrow.svg" height="11" class="ms-2"> </a>
+      </div>
+      <hr>
+      <div class="steps-slider slick-initialized slick-slider" id="steps-slider-container">
+        <div class="slick-list draggable">
+          <div class="slick-track" style="opacity: 1; width: 1116px; transform: translate3d(0px, 0px, 0px);">
+            <div class="step-card slick-slide slick-current slick-active success" data-slick-index="0" aria-hidden="false" tabindex="0" style="width: 120px; height: 65px;">
+              <p class="">1. Introducción</p>
+            </div>
+            <div class="step-card slick-slide slick-active success" data-slick-index="1" aria-hidden="false" tabindex="0" style="width: 120px; height: 65px;">
+              <p class="">2. Amenazas</p>
+            </div>
+            <div class="step-card slick-slide slick-active success" data-slick-index="2" aria-hidden="false" tabindex="0" style="width: 120px; height: 65px;">
+              <p class="">3. Video Tutorial</p>
+            </div>
+            <div class="step-card slick-slide slick-active success" data-slick-index="3" aria-hidden="false" tabindex="0" style="width: 120px; height: 65px;">
+              <p class="">4. Resumen</p>
+            </div>
+            <div class="step-card slick-slide slick-active success" data-slick-index="4" aria-hidden="false" tabindex="0" style="width: 120px; height: 65px;">
+              <p class="">5. Imagen</p>
+            </div>
+            <div class="step-card slick-slide slick-active active" data-slick-index="5" aria-hidden="false" tabindex="0" style="width: 120px; height: 65px; background: #8540F5;">
+              <p class="mb-0 fw-500" style="color: #ffffff;">6. Intro Trivia</p>
+            </div>
+            <div class="step-card slick-slide slick-active locked" data-slick-index="6" aria-hidden="false" tabindex="0" style="width: 120px; height: 65px;">
+              <p class="mb-0">7. Pregunta</p>
+            </div>
+            <div class="step-card slick-slide slick-active locked" data-slick-index="7" aria-hidden="false" tabindex="0" style="width: 120px; height: 65px;">
+              <p class="mb-0">8. Pregunta</p>
+            </div>
+            <div class="step-card slick-slide slick-active locked" data-slick-index="8" aria-hidden="false" tabindex="0" style="width: 120px; height: 65px;">
+              <p class="mb-0">9. Resultados</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-------------------------------- respuesta pregunta -------------------------------->
+<div class="card rounded-4">
+  <div class="card-body p-3">
+    <div class="d-flex align-items-center">
+      <img src="img/error.svg" height="35">
+      <p class="mb-0 ms-3 font12">¿Cuál es la técnica más común de ingeniería social?</p>
+    </div>
+    <hr>
+    <div class="card rounded-2 p-3 bg-subtle mt-2">
+      <p class="font10 mb-0 p-0 fw-500 text-grey-500 text-uppercase">Tu respuesta</p>
+      <p class="text-black mb-0 fw-600 lh-sm">Firewall</p>
+    </div>
+    <div class="d-flex align-items-start mt-3 fit-content rounded-2">
+      <p class="mb-0 fw-600 ms-0 font11 text-red-700 lh-sm">Explicación</p>
+    </div>
+    <p class="mb-0 text-black font11 mt-1">El phishing es la técnica más utilizada porque se basa en el engaño directo al usuario.</p>
+  </div>
+</div>
+
+</body>
+</html>

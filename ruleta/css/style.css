@@ -10,10 +10,20 @@ body {
 }
 
 .btn-primary {background-color: #3874FF;}
-
+.font14 {
+    font-size: 14px;
+    line-height: 19px;
+}
+.wh-45
+ {
+    min-width: 45px;
+    min-height: 45px;
+    text-align: center;
+    line-height: 45px;
+}
 /* CONNECT WORDS */
 .cards-ob .card {
-    min-height: 190px;
+    min-height: 120px;
 }
 .bg-green-100 {background-color: #D9FBD0;}
 .bg-blue-100 {background-color: #E5EDFF;}
