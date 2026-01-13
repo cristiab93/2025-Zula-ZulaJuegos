@@ -82,21 +82,10 @@ function RenderSlider() {
     else if (idx < estado.currentIndex) card.classList.add("success");
     else card.classList.add("locked");
 
-    const iconDiv = document.createElement("div");
-    iconDiv.className = "icon-circle";
-    if (idx < estado.currentIndex) {
-      iconDiv.innerHTML = `<img src="img/check.svg" height="9">`;
-    } else if (idx > estado.currentIndex) {
-      iconDiv.innerHTML = `<img src="img/lock.svg" height="15">`;
-    } else {
-      iconDiv.style.display = "none";
-    }
-
     const p = document.createElement("p");
     p.className = (idx < estado.currentIndex) ? "" : "mb-0";
     p.textContent = `${idx + 1}. ${inst.step_title || 'Info'}`;
 
-    card.appendChild(iconDiv);
     card.appendChild(p);
     stepsSliderContainer.appendChild(card);
   });
@@ -421,20 +410,7 @@ function UpdateSliderClasses() {
     else if (idx < estado.currentIndex) card.classList.add("success");
     else card.classList.add("locked");
 
-    // Update icons
-    const iconDiv = card.querySelector(".icon-circle");
-    if (iconDiv) {
-      if (idx < estado.currentIndex) {
-        iconDiv.style.display = "flex";
-        iconDiv.innerHTML = `<img src="img/check.svg" height="9">`;
-      } else if (idx > estado.currentIndex) {
-        iconDiv.style.display = "flex";
-        iconDiv.innerHTML = `<img src="img/lock.svg" height="15">`;
-      } else {
-        iconDiv.style.display = "none";
-        iconDiv.innerHTML = "";
-      }
-    }
+
   });
 
   $(stepsSliderContainer).slick('slickGoTo', estado.currentIndex);
