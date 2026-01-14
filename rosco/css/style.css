@@ -9,16 +9,41 @@ body {
     position: relative;
 }
 
+.bg-red-200
+ {
+    background-color: #FABCB3;
+}
+.text-red-700 {
+    color: #B81800;
+}
+.text-green-700 {
+    color: #1C6C09;
+}
 .bg-green-100 {
     background-color: #D9FBD0;
 }
-
+.bg-green-200 {
+    background-color: #BEE8B4;
+}
 .bg-blue-100 {
     background-color: #E5EDFF;
 }
 
 .bg-red-100 {
     background-color: #FFE0DB;
+}
+.font12 {
+    font-size: 12px;
+}
+.font11 {
+    font-size: 11px;
+}
+.font10 {
+    font-size: 10px;
+}
+.modal h4
+ {
+    font-size: 18px;
 }
 
 .font14 {
