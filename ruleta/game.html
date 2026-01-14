@@ -26,12 +26,30 @@
 
             <!-- RULETA CENTRADA -->
             <div class="col-10 col-md-7 col-lg-5 col-xl-4" hidden>
-                <p class="mb-5 font12 gray-600">Pulsá GIRAR para comenzar</p>
+                <p class="mb-5 font12 gray-600">Al girar la ruleta te seleccionará<br>
+                    una pregunta aleatoria para que respondas.</p>
                 <div class="position-relative">
+                    <div class="wheel-container">
+                        <!-- Luz de ganador -->
+                        <div class="winner-highlight" id="highlight"></div>
 
-                    <img id="ruleta" src="img/ruleta.png" class="img-fluid position-relative ruleta" />
-                    <div class="position-absolute top-50 start-50 translate-middle puntero">
-                        <img id="puntero" src="img/girar.png" height="140" />
+                        <!-- Ruleta -->
+                        <div class="wheel" id="wheel">
+                            <!-- data-angle define la posición inicial de cada número (0, 45, 90...) -->
+                            <div class="number one" data-angle="0">1</div>
+                            <div class="number" data-angle="45">2</div>
+                            <div class="number" data-angle="90">3</div>
+                            <div class="number" data-angle="135">4</div>
+                            <div class="number" data-angle="180">5</div>
+                            <div class="number" data-angle="225">6</div>
+                            <div class="number" data-angle="270">7</div>
+                            <div class="number" data-angle="315">8</div>
+                        </div>
+
+                        <!-- Botón central -->
+                        <div class="center-circle" onclick="startSpin()">
+                            <img src="img/arrow-ruleta.svg">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -40,12 +58,9 @@
 
             <div class="col-xl-10 text-center">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="text-start">
-                        <div class="bg-gray-200 fit-content px-2 py-1 rounded-2">
-                            <img src="img/alert.svg" height="17">
-                        </div>
-                        <p class="gray-600 mb-0 font13 mt-2">Leé la definición <br>
-                            y arriesgá tu respuesta.</p>
+                    <div class="text-center bg-gray-200 fit-content px-3 py-1 rounded-2">
+                    <p class="gray-600 mb-0 font11">Preg.</p>
+                    <p class="text-black fw-700 font14 mb-0">1/4</p>
                     </div>
 
 
@@ -65,49 +80,53 @@
                 </div>
 
                 <div class="row align-items-center justify-content-center mt-4">
-                    <div class="col-12 col-md-5">
+                    <div class="col-12 col-md position-relative">
 
-                        <div class="position-relative">
+                       <div class="wheel-container">
+                        <!-- Luz de ganador -->
+                        <div class="winner-highlight" id="highlight"></div>
 
-                            <img id="ruleta" src="img/ruleta.png" class="img-fluid position-relative ruleta" />
-                            <div class="position-absolute top-50 start-50 translate-middle puntero">
-                                <img id="puntero" src="img/girar.png" height="140" />
-                            </div>
+                        <!-- Ruleta -->
+                        <div class="wheel" id="wheel">
+                            <!-- data-angle define la posición inicial de cada número (0, 45, 90...) -->
+                            <div class="number one" data-angle="0">1</div>
+                            <div class="number" data-angle="45">2</div>
+                            <div class="number" data-angle="90">3</div>
+                            <div class="number" data-angle="135">4</div>
+                            <div class="number" data-angle="180">5</div>
+                            <div class="number" data-angle="225">6</div>
+                            <div class="number" data-angle="270">7</div>
+                            <div class="number" data-angle="315">8</div>
                         </div>
 
+                        <!-- Botón central -->
+                        <div class="center-circle" onclick="startSpin()">
+                            <img src="img/arrow-ruleta.svg">
+                        </div>
+                    </div>
 
 
                     </div>
 
-                    <div class="col-12 col-md-6 offset-md-1 text-start">
-                        <div class="bg-white gray-600 px-2 fit-content font10 rounded-1 mb-3 fw-500">CONTRASEÑAS</div>
-                       
+                    <div class="col-12 col-md text-start">
+
                         <h3 class="fw-600 text-black mb-4">¿Cuál de estas es una señal de alerta de phishing?</h3>
-                       
-                        <div class="form-check bg-white border py-3 w-100 ps-5 rounded-3 mb-2">
-                            <input class="form-check-input me-3" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                            <label class="form-check-label font14" for="flexRadioDefault1">
-                                Correo de un contacto conocido
-                            </label>
+
+                        <div class="form-check bg-white border py-3 w-100 rounded-3 mb-3">
+                        <p class="font14 mb-0">Correo de un contacto conocido</p>
                         </div>
 
-                        <div class="form-check bg-white active border py-3 w-100 ps-5 rounded-3 mb-2">
-                            <input class="form-check-input me-3" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                            <label class="form-check-label font14" for="flexRadioDefault1">
-                                Correo de un contacto conocido
-                            </label>
+                        <div class="form-check bg-white active border py-3 w-100 rounded-3 mb-3">
+                        <p class="font14 mb-0">Correo de un contacto conocido</p>
                         </div>
 
-                        <div class="form-check bg-white border py-3 w-100 ps-5 rounded-3 mb-2">
-                            <input class="form-check-input me-3" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                            <label class="form-check-label font14" for="flexRadioDefault1">
-                                Correo de un contacto conocido
-                            </label>
+                        <div class="form-check bg-white border py-3 w-100 rounded-3 mb-3">
+                        <p class="font14 mb-0">Correo de un contacto conocido</p>
                         </div>
 
-                        <button class="btn btn-siguiente fw-600 mt-4 fit-content px-4 rounded-2 py-2">SIGUIENTE</button>
+                        <button class="btn btn-siguiente fw-500 mt-4 fit-content px-4 rounded-2 py-2">SIGUIENTE</button>
 
-                  
+
                     </div>
                 </div>
 
@@ -145,7 +164,77 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/ruleta.js"></script>
+    <script>
+        const DISTANCE = 150; // Distancia de los números al centro
+        const wheel = document.getElementById('wheel');
+        const numbers = document.querySelectorAll('.number');
+        const highlight = document.getElementById('highlight');
+
+        let currentRotation = 0;
+        let targetRotation = 0;
+        let isSpinning = false;
+
+        // Renderizar posición inicial
+        updatePositions();
+
+        function startSpin() {
+            if (isSpinning) return;
+            isSpinning = true;
+            highlight.classList.remove('active');
+
+            // 1. Calcular giro aleatorio (entre 20 y 40 gajos extra)
+            const randomWedges = Math.floor(20 + Math.random() * 20);
+
+            // 2. Multiplicar por 45 para asegurar que caiga EXACTO en un centro
+            const extraDegrees = randomWedges * 45;
+
+            targetRotation = currentRotation + extraDegrees;
+
+            animateWheel();
+        }
+
+        function animateWheel() {
+            const speed = 0.05;
+            const diff = targetRotation - currentRotation;
+
+            // Si estamos muy cerca del final, forzamos el valor exacto y paramos
+            if (diff < 0.5) {
+                currentRotation = targetRotation;
+                updatePositions();
+                finishSpin();
+                return;
+            }
+
+            // Interpolación para movimiento suave
+            currentRotation += diff * speed;
+            updatePositions();
+            requestAnimationFrame(animateWheel);
+        }
+
+        function updatePositions() {
+            // Girar el fondo de la ruleta (negativo = anti-horario visual)
+            wheel.style.transform = `rotate(-${currentRotation}deg)`;
+
+            numbers.forEach(num => {
+                const startAngle = parseFloat(num.getAttribute('data-angle'));
+
+                // EFECTO NORIA:
+                // rotate(startAngle) -> Coloca el número en su gajo
+                // translate -> Lo aleja del centro
+                // rotate(-startAngle + currentRotation) -> Lo endereza + compensa el giro de la rueda
+                num.style.transform = `
+                    rotate(${startAngle}deg) 
+                    translate(${DISTANCE}px) 
+                    rotate(${-startAngle + currentRotation}deg)
+                `;
+            });
+        }
+
+        function finishSpin() {
+            isSpinning = false;
+            highlight.classList.add('active'); // Encender la luz
+        }
+    </script>
     <script src="js/game.js"></script>
 </body>
 
