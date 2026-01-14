@@ -11,6 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
+
+
 </head>
 
 <body class="bg-lines">
@@ -31,6 +33,10 @@
 
 
 
+
+
+
+
           <div class="timer">
             <svg class="progress-ring" width="100" height="100">
               <circle class="progress-ring__background" cx="50" cy="50" r="42" />
@@ -40,6 +46,13 @@
             <div class="timer-content">
               <span class="icon"><img src="img/clock.gif"></span>
               <span class="time" id="time">01:00</span>
+
+
+
+
+
+
+
             </div>
           </div>
 
@@ -48,37 +61,69 @@
         <div class="row align-items-center justify-content-center">
           <div class="col-12 col-md-6 text-start">
 
-           <h3 class="text-black fw-600 mt-3">El CBU identifica de forma única una cuenta bancaria en Argentina.</h3>
-           <p class="gray-700">El CBU es el identificador único de 
-cuentas en el sistema argentino.</p>
-            <button class="btn btn-siguiente fw-600 mt-4 fit-content px-4 rounded-2 py-2">SIGUIENTE</button>
+            <h3 class="text-black fw-600 mt-3" id="question-text">El CBU identifica de forma única una cuenta bancaria
+              en Argentina.</h3>
+            <p class="gray-700" id="question-desc">El CBU es el identificador único de
+              cuentas en el sistema argentino.</p>
+            <p class="fw-500 text-primary mt-2" id="answer-explanation" style="display:none;"></p>
+            <button class="btn btn-siguiente fw-600 mt-4 fit-content px-4 rounded-2 py-2"
+              id="btn-next">SIGUIENTE</button>
 
 
           </div>
 
           <div class="col-12 col-md-6 text-start cards-vf">
-          <div class="row align-items-start">
-          <div class="col-6">
-          <div class="h-100 bg-white verdadero active border rounded-3 text-center">
-          <div class="bg-green card-v rounded-3 m-3 d-flex align-items-center justify-content-center">
-          <h4 class="mb-0 text-white fw-600">V</h4>
-          </div>
+            <div class="row align-items-start">
+              <div class="col-6">
+                <div class="h-100 bg-white verdadero active border rounded-3 text-center" id="btn-true">
+                  <div class="bg-green card-v rounded-3 m-3 d-flex align-items-center justify-content-center">
+                    <h4 class="mb-0 text-white fw-600">V</h4>
+                  </div>
+
+
+
+
+
+                </div>
+
+
+                <p class="text-violeta fw-600 text-center bg-white border px-3 py-4 rounded-3 mt-3 feedback-msg"
+                  style="display:none;">CORRECTO!</p>
+
+
+
+
+              </div>
+
+
+              <div class="col-6">
+                <div class="h-100 bg-white falso border rounded-3 text-center" id="btn-false">
+                  <div class="bg-red card-v rounded-3 m-3 d-flex align-items-center justify-content-center">
+                    <h4 class="mb-0 text-white fw-600">F</h4>
+                  </div>
+                </div>
+                <p class="text-violeta fw-600 text-center bg-white border px-3 py-4 rounded-3 mt-3 feedback-msg"
+                  style="display:none;">CORRECTO!</p>
+              </div>
+            </div>
           </div>
 
-          <p class="text-violeta fw-600 text-center bg-white border px-3 py-4 rounded-3 mt-3">CORRECTO!</p>
-          </div>
-
-          <div class="col-6">
-          <div class="h-100 bg-white falso border rounded-3 text-center">
-          <div class="bg-red card-v rounded-3 m-3 d-flex align-items-center justify-content-center">
-          <h4 class="mb-0 text-white fw-600">F</h4>
-          </div>
-          </div>
-           <p class="text-violeta fw-600 text-center bg-white border px-3 py-4 rounded-3 mt-3" hidden>CORRECTO!</p>
-          </div>
-          </div>
-          </div>
         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -91,57 +136,8 @@ cuentas en el sistema argentino.</p>
   <!-- Scripts: bootstrap + Sortable (igual que tenías) -->
   <script src="js/bootstrap.bundle.min.js"></script>
 
-  <script>
-    const circle = document.querySelector(".progress-ring__circle");
-    const timeText = document.getElementById("time");
-
-    const radius = 42; // 👈 coincide con el SVG
-    const circumference = 2 * Math.PI * radius;
-
-    circle.style.strokeDasharray = circumference;
-    circle.style.strokeDashoffset = 0;
-
-    let totalTime = 60;
-    let elapsed = 0;
-
-    function formatTime(seconds) {
-      const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-      const s = String(seconds % 60).padStart(2, "0");
-      return `${m}:${s}`;
-    }
-
-    function setProgress(elapsed) {
-      const offset = (elapsed / totalTime) * circumference;
-      circle.style.strokeDashoffset = offset;
-    }
-
-    timeText.textContent = formatTime(totalTime);
-
-    let start = null;
-
-    function animate(timestamp) {
-      if (!start) start = timestamp;
-
-      const elapsedMs = timestamp - start;
-      const elapsedSeconds = Math.min(elapsedMs / 1000, totalTime);
-
-      setProgress(elapsedSeconds);
-      timeText.textContent = formatTime(Math.ceil(totalTime - elapsedSeconds));
-
-      if (elapsedSeconds < totalTime) {
-        requestAnimationFrame(animate);
-      }
-    }
-
-    requestAnimationFrame(animate);
-
-  </script>
-
-
-
-
-
-
+  <!-- Removed Inline Script to manage it from game.js -->
+  <script src="js/game.js"></script>
 </body>
 
 </html>

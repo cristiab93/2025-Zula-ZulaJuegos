@@ -39,7 +39,7 @@ function ValidarGid()
   if (!isset($_POST["gid"])) return null;
   $gid = trim($_POST["gid"]);
   if ($gid === "") return null;
-  if (!isset($_SESSION["connect_words"]) || !isset($_SESSION["connect_words"][$gid])) return null;
+  if (!isset($_SESSION["verdadero_falso"]) || !isset($_SESSION["verdadero_falso"][$gid])) return null;
   return $gid;
 }
 
@@ -49,26 +49,38 @@ if (!$gid) {
   goto RESPOND;
 }
 
-$s =& $_SESSION["connect_words"][$gid];
+$s =& $_SESSION["verdadero_falso"][$gid];
 
 $timeLeft = TiempoRestante($s);
 $elapsed = (int)$s["duration"] - $timeLeft;
 if ($elapsed < 0) $elapsed = 0;
 
-$expectedGroups = isset($s["cols"]) ? (int)$s["cols"] : 4;
-$status = (count($s["solved_groups"]) === $expectedGroups) ? "won" : "lost";
+// Calcular puntos finales desde la sesión
+$points = (int)($s["score"] ?? 0);
+
+// Si el juego ya terminó, no guardamos de nuevo
+if (isset($s["ended"]) && (int)$s["ended"] === 1) {
+  $resp = [
+    "success" => 1,
+    "status" => "already_finished",
+    "points" => $points,
+    "finish_second" => $elapsed
+  ];
+  goto RESPOND;
+}
+
+$outcome = "finished";
 $s["ended"] = 1;
 
-$points = count($s["solved_groups"]) * 25;
-
-GuardarResultado($s, $gid, $status, $elapsed, $points);
+GuardarResultado($s, $gid, $outcome, $elapsed, $points);
 
 $resp = [
   "success" => 1,
-  "status" => $status,
+  "status" => $outcome,
   "points" => $points,
   "finish_second" => $elapsed
 ];
+
 
 /* =========================
    PARTE 3: Respuesta JSON
