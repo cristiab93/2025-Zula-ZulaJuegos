@@ -13,7 +13,7 @@ const estado = {
 
 // DOM Elements
 const progressCounterEl = document.getElementById("progress-counter");
-const mainTitleEl = document.getElementById("main-title");
+
 const btnPrev = document.getElementById("btn-prev");
 const btnNext = document.getElementById("btn-next");
 const btnFinish = document.getElementById("btn-finish");
@@ -126,13 +126,7 @@ function RenderScreen() {
   // Update progress
   progressCounterEl.textContent = `${estado.currentIndex + 1}/${estado.instances.length}`;
 
-  // Handle Title
-  if (inst.title) {
-    mainTitleEl.textContent = inst.title;
-    mainTitleEl.style.display = "block";
-  } else {
-    mainTitleEl.style.display = "none";
-  }
+  // Handle Title logic moved after screen identification
 
   // Identify screen element
   let screenId = "";
@@ -158,6 +152,17 @@ function RenderScreen() {
 
     // Specific content injection
     PopulateScreenContent(inst, screenId);
+
+    // Update Title specific to this screen
+    const titleEl = screenEl.querySelector(".game-main-title");
+    if (titleEl) {
+      if (inst.title) {
+        titleEl.textContent = inst.title;
+        titleEl.style.display = "block";
+      } else {
+        titleEl.style.display = "none";
+      }
+    }
   }
 
   UpdateNavigation();
