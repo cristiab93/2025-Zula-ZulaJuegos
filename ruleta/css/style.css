@@ -11,8 +11,8 @@ body {
 
 .wheel-container {
     position: relative;
-    width: 420px;
-    height: 420px;
+    width: 415px;
+    height: 415px;
     filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.15));
 }
 
@@ -22,24 +22,8 @@ body {
     border-radius: 50%;
     position: relative;
     /* El gradiente empieza girado -22.5deg para centrar el primer color arriba */
-    background: conic-gradient(from -22.5deg,
-            #739CFF 0deg 45deg,
-            /* 1 - Verde */
-            #84BBBF 45deg 90deg,
-            /* 2 */
-            #90D67F 90deg 135deg,
-            /* 3 */
-            #C7D182 135deg 180deg,
-            /* 4 */
-            #FFCC85 180deg 225deg,
-            /* 5 */
-            #E1B4C2 225deg 270deg,
-            /* 6 */
-            #C29CFF 270deg 315deg,
-            /* 7 */
-            #9E9FFF 315deg 360deg
-            /* 8 */
-        );
+    transition: transform 0.1s linear;
+    /* Suavizado mínimo para la animación JS */
 }
 
 /* HIGHLIGHT GEOMÉTRICO (Triángulo perfecto arriba) */
@@ -63,6 +47,7 @@ body {
     opacity: 1;
     animation: pulse 1s infinite alternate;
 }
+
 
 @keyframes pulse {
     from {
@@ -91,9 +76,13 @@ body {
     margin-left: -20px;
 }
 
-.number.one {
-    background: #fff;
+.number.winner {
+    background: #FFFFFF !important;
+    /* Fondo blanco sólido */
+    color: #000000 !important;
+    /* Texto negro puro */
 }
+
 
 .center-circle {
     position: absolute;
@@ -524,6 +513,12 @@ body {
 
 .btn-siguiente {
     background-color: #6610F2;
+    color: #FFFFFF;
+}
+
+.btn-siguiente:disabled {
+    background-color: #C29FFA;
+    border-color: #C29FFA;
     color: #FFFFFF;
 }
 

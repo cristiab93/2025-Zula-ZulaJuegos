@@ -131,6 +131,7 @@ body {
 .btn-arrow {
     background-color: #E3E6ED !important;
     /* Visible Gray */
+    min-height: 40px;
     border: 1px solid #D1D5DB;
     transition: all 0.2s ease;
     border-radius: 8px;
@@ -160,7 +161,8 @@ body {
 }
 
 .btn-arrow:disabled {
-    cursor: not-allowed;
+    cursor: not-allowed;    border-color: #b8babf;
+    opacity: 1;
 }
 
 .btn-arrow.active:hover {
@@ -354,6 +356,7 @@ body {
     color: #8A94AD;
     font-weight: 400;
     font-size: 14px;
+    text-transform: initial;
 }
 
 
