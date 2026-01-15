@@ -421,6 +421,15 @@ function UpdateSliderClasses() {
   $(stepsSliderContainer).slick('slickGoTo', estado.currentIndex);
 }
 
+function ResetAndPauseVideo() {
+  const videoEl = document.getElementById('text-video-src');
+  if (videoEl) {
+    videoEl.currentTime = 0; // Reiniciar al inicio
+    videoEl.pause(); // Pausar
+    dbg("VIDEO_RESET_AND_PAUSED");
+  }
+}
+
 // Global Event Listeners
 btnNext.onclick = async () => {
   const currentInst = estado.instances[estado.currentIndex];
@@ -463,6 +472,9 @@ btnNext.onclick = async () => {
   }
 
   if (estado.currentIndex < estado.instances.length - 1) {
+    // Reiniciar y pausar el video al cambiar de sección
+    ResetAndPauseVideo();
+
     estado.currentIndex++;
     estado.pendingAnswer = null; // Clear any stale pending
     RenderScreen();
@@ -471,6 +483,9 @@ btnNext.onclick = async () => {
 
 btnPrev.onclick = () => {
   if (estado.currentIndex > 0) {
+    // Reiniciar y pausar el video al cambiar de sección
+    ResetAndPauseVideo();
+
     estado.currentIndex--;
     RenderScreen();
   }
