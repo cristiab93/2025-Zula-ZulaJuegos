@@ -149,19 +149,126 @@ async function EnviarAccion(op, payload = {}) {
         dbg("ACTION_RESPONSE", res);
 
         if (res.success) {
-            const indexChanged = estado.currentIndex !== res.current_index;
-            estado.currentIndex = res.current_index;
-            estado.answersStatus = res.answers_status;
-
-            if (res.status === "won" || res.status === "lost") {
-                FinalizarJuego(res);
+            // Check for feedback (modal)
+            if (res.feedback) {
+                // If feedback exists, show modal FIRST.
+                // The index update and screen update can happen behind, 
+                // but visually we want the user to see the result of THIS answer before moving on.
+                ShowFeedbackModal(res.feedback, () => {
+                    // Callback after modal closed? 
+                    // Actually, we can update the state immediately, but maybe wait to clear input/focus?
+                    // Just let it flow. The modal is overlay.
+                    ProceedWithStateUpdate(res);
+                });
             } else {
-                UpdateScreen(indexChanged);
+                ProceedWithStateUpdate(res);
             }
         }
     } catch (e) {
         console.error("Error sending action:", e);
     }
+}
+
+function ProceedWithStateUpdate(res) {
+    const indexChanged = estado.currentIndex !== res.current_index;
+    estado.currentIndex = res.current_index;
+    estado.answersStatus = res.answers_status;
+
+    if (res.status === "won" || res.status === "lost") {
+        FinalizarJuego(res);
+    } else {
+        UpdateScreen(indexChanged);
+    }
+}
+
+const modalCorrectEl = document.getElementById('correct');
+const modalTimeoutEl = document.getElementById('timeout');
+let modalCorrect = null;
+let modalTimeout = null;
+
+// Setup Modal Buttons once
+document.addEventListener("DOMContentLoaded", () => {
+    // Initialize modals if bootstrap is available
+    if (typeof bootstrap !== 'undefined') {
+        if (modalCorrectEl) modalCorrect = new bootstrap.Modal(modalCorrectEl, { backdrop: 'static', keyboard: false });
+        if (modalTimeoutEl) modalTimeout = new bootstrap.Modal(modalTimeoutEl, { backdrop: 'static', keyboard: false });
+    } else {
+        console.error("[ROSCO] Bootstrap is not defined!");
+    }
+
+    if (modalCorrectEl) {
+        const btn = modalCorrectEl.querySelector("button");
+        if (btn) btn.addEventListener("click", () => {
+            if (modalCorrect) modalCorrect.hide();
+            setTimeout(() => gameInput.focus(), 100);
+        });
+    }
+
+    if (modalTimeoutEl) {
+        const btn = modalTimeoutEl.querySelector("button");
+        if (btn) btn.addEventListener("click", () => {
+            if (modalTimeout) modalTimeout.hide();
+            setTimeout(() => gameInput.focus(), 100);
+        });
+    }
+});
+
+function ShowFeedbackModal(feedback, callback) {
+    console.log("[ROSCO] ShowFeedbackModal called with:", feedback);
+    if (!modalCorrect || !modalTimeout) {
+        console.warn("[ROSCO] Modals not initialized. Bootstrap missing?");
+        if (callback) callback();
+        return;
+    }
+
+    // feedback: { status: 'success'|'error', correct_answer, explanation, title }
+
+    if (feedback.status === 'success') {
+        const el = document.getElementById('correct');
+        // Update content
+        el.querySelector('h4').textContent = feedback.title || "¡Respuesta Correcta!";
+
+        const explDiv = el.querySelector('.bg-green-100');
+        const explText = el.querySelector('p.text-black');
+
+        if (feedback.explanation) {
+            explDiv.style.display = 'flex';
+            explText.style.display = 'block';
+            explText.textContent = feedback.explanation;
+        } else {
+            // Hide explanation box if empty
+            explDiv.style.display = 'none';
+            explText.style.display = 'none';
+        }
+
+        modalCorrect.show();
+    } else {
+        const el = document.getElementById('timeout');
+        // Update content
+        el.querySelector('h4').textContent = feedback.title || "Casi... Respuesta Incorrecta";
+
+        const explDiv = el.querySelector('.bg-red-100');
+        const explText = el.querySelector('p.text-black');
+
+        let msg = "";
+
+        if (feedback.explanation) {
+            msg += feedback.explanation;
+        }
+
+        if (msg) {
+            explDiv.style.display = 'flex';
+            explText.style.display = 'block';
+            explText.textContent = msg;
+        } else {
+            explDiv.style.display = 'none';
+            explText.style.display = 'none';
+        }
+
+        modalTimeout.show();
+    }
+
+    if (callback) callback();
 }
 
 // Timer Logic
@@ -264,8 +371,45 @@ gameInput.onclick = () => {
 
 document.addEventListener("DOMContentLoaded", () => {
     IniciarJuego();
-    // Extra focus attempt
-    setTimeout(() => {
-        if (gameInput) gameInput.focus();
-    }, 1000);
+
+    // Check for modal backdrop issues
+    setInterval(() => {
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop && !document.body.classList.contains('modal-open')) {
+            console.warn("[ROSCO] Found orphaned backdrop, removing...");
+            backdrop.remove();
+        }
+    }, 2000);
+
+    // Aggressive Input Enabler
+    if (gameInput) {
+        // Debug listeners
+        gameInput.addEventListener('focus', () => console.log("[ROSCO] Input FOCUSED"));
+        gameInput.addEventListener('blur', () => console.log("[ROSCO] Input BLURRED"));
+
+        let attempts = 0;
+        const enabler = setInterval(() => {
+            attempts++;
+            if (attempts > 20) clearInterval(enabler); // Stop after ~10 seconds
+
+            if (gameInput.disabled) {
+                console.warn("[ROSCO] Input was disabled, enabling...");
+                gameInput.disabled = false;
+            }
+            if (gameInput.readOnly) {
+                console.warn("[ROSCO] Input was readOnly, fixing...");
+                gameInput.readOnly = false;
+            }
+
+            // Only focus if we don't have it (to avoid flickering cursor if user is typing)
+            if (document.activeElement !== gameInput && !estado.juegoTerminado) {
+                // console.log("[ROSCO] Re-focusing input...");
+                // gameInput.focus(); 
+                // Don't force focus repeatedly as it might be annoying if user clicked away, 
+                // but for "Start" issue, we want to ensure it's usable.
+                // Let's force it only in the first 2 seconds.
+                if (attempts < 5) gameInput.focus();
+            }
+        }, 500);
+    }
 });

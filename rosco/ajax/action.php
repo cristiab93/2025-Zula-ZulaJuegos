@@ -70,6 +70,15 @@ switch ($op) {
             $game["answers_status"][$idx] = 'error';
         }
 
+        // Prepare feedback logic
+        $feedback = [
+            "status" => $isCorrect ? "success" : "error",
+            "correct_answer" => is_array($correctAnswers) ? implode(" / ", $correctAnswers) : $correctAnswers,
+            "explanation" => isset($item["explanation"]) ? $item["explanation"] : "",
+            "title" => isset($item["title"]) ? $item["title"] : ($isCorrect ? "¡Respuesta Correcta!" : "Respuesta Incorrecta")
+        ];
+        $resp["feedback"] = $feedback;
+
         MoveToNext($game);
         break;
 
