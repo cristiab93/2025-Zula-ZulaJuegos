@@ -154,6 +154,15 @@ if ($op === "swap") {
     goto RESPOND;
   }
 
+  // [MOD] Prevent horizontal swap (same row)
+  $rowFrom = floor($from / $cols);
+  $rowTo = floor($to / $cols);
+
+  if ($rowFrom === $rowTo) {
+    $resp = ["success" => 0, "error" => "HORIZONTAL_SWAP_NOT_ALLOWED"];
+    goto RESPOND;
+  }
+
   $nuevos = AplicarSwap($s, $from, $to);
   $status = "playing";
   $message = "";

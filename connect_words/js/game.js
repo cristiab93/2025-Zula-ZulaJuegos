@@ -225,6 +225,9 @@ function ClearHoverTarget() {
   document.querySelectorAll(".cw-swap-target").forEach(el => {
     el.classList.remove("cw-swap-target");
   });
+  document.querySelectorAll(".cw-target-invalid").forEach(el => {
+    el.classList.remove("cw-target-invalid");
+  });
   estado.lastTargetId = null;
 }
 
@@ -234,11 +237,31 @@ function SetHoverTarget(id) {
     ClearHoverTarget();
     return;
   }
-  if (estado.lastTargetId && String(estado.lastTargetId) === v) return;
+  // Check if we already have this target as valid
+  const currentIsInvalid = document.querySelector(".cw-target-invalid[data-tile-id='" + v + "']");
+  if (estado.lastTargetId && String(estado.lastTargetId) === v && !currentIsInvalid) return;
+
   ClearHoverTarget();
   const el = TileElById(v);
   if (!el) return;
   el.classList.add("cw-swap-target");
+  estado.lastTargetId = v;
+}
+
+function SetInvalidTarget(id) {
+  const v = String(id || "");
+  if (!v) {
+    ClearHoverTarget();
+    return;
+  }
+  // Check if we already have this target as invalid
+  const currentInv = document.querySelector(".cw-target-invalid[data-tile-id='" + v + "']");
+  if (estado.lastTargetId && String(estado.lastTargetId) === v && currentInv) return;
+
+  ClearHoverTarget();
+  const el = TileElById(v);
+  if (!el) return;
+  el.classList.add("cw-target-invalid");
   estado.lastTargetId = v;
 }
 
@@ -833,6 +856,26 @@ function Renderizar() {
         if (estado.draggingId) SetDraggingSource(estado.draggingId, true);
       },
       onMove: evt => {
+        // [MOD] Validacion de movimiento horizontal (misma fila)
+        if (evt.from === evt.to) {
+          // Intentamos usar nuestra logica robusta primero
+          const coords = CoordsFromSortableEvent(evt);
+          let targetId = null;
+          if (coords) {
+            targetId = TargetIdDesdePunto(evt.dragged, coords);
+          }
+
+          if (targetId) {
+            SetInvalidTarget(targetId);
+          } else if (evt.related && evt.related.classList.contains('col')) {
+            // FALLBACK: Si no pudimos detectar ID por coordenadas, usamos evt.related
+            // Esto es vital si TargetIdDesdePunto falla
+            evt.related.classList.add("cw-target-invalid");
+          }
+
+          return false;
+        }
+
         const dragId = estado.draggingId;
         if (!dragId) {
           ClearHoverTarget();
@@ -945,7 +988,7 @@ function EnviarAccion(op, payload, silent) {
 
   const data = Object.assign({ gid: estado.gid, op }, payload || {});
 
-   console.log("[CW] action.php payload =>", data);
+  console.log("[CW] action.php payload =>", data);
   if (!silent) dbg("API_SEND", data);
 
   $.post("ajax/action.php", data, resp => {
@@ -1052,8 +1095,8 @@ function IniciarJuego() {
     if (typeof parsed === "string") {
       try { parsed = JSON.parse(parsed); } catch (e) { parsed = {}; }
     }
-    
-    console.log (parsed);
+
+    console.log(parsed);
 
     if (!parsed || !parsed.success) {
       mensajeEl.textContent = (parsed && parsed.error) ? parsed.error : "No hay configuración activa";
