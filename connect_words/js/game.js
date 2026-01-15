@@ -835,7 +835,7 @@ function Renderizar() {
   boardEl.querySelectorAll(".js-sortable").forEach(el => {
     const sortable = new Sortable(el, {
       group: { name: "shared", pull: true, put: true },
-      sort: false,
+      sort: true,
       animation: 150,
       easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
       draggable: ".col",
@@ -857,22 +857,40 @@ function Renderizar() {
       },
       onMove: evt => {
         // [MOD] Validacion de movimiento horizontal (misma fila)
+        // [MOD] Validacion de movimiento horizontal (misma fila)
         if (evt.from === evt.to) {
-          // Intentamos usar nuestra logica robusta primero
+          // [DEBUG] Horizontal move detected
           const coords = CoordsFromSortableEvent(evt);
           let targetId = null;
-          if (coords) {
-            targetId = TargetIdDesdePunto(evt.dragged, coords);
+
+          // 1. Try Sortable related element
+          if (evt.related) {
+            const col = evt.related.closest('.col[data-tile-id]');
+            if (col && col.dataset.tileId) {
+              targetId = col.dataset.tileId;
+            }
+          }
+
+          // 2. Fallback to point detection
+          if (!targetId && coords) {
+            // Pass dragging element to hide it during point check if needed
+            targetId = TargetIdDesdePunto(evt.item || evt.dragged, coords);
+          }
+
+          if (DEBUG) {
+            console.log("[CW] onMove Horizontal:", {
+              x: coords ? coords.x : '?',
+              y: coords ? coords.y : '?',
+              related: evt.related,
+              targetId: targetId
+            });
           }
 
           if (targetId) {
             SetInvalidTarget(targetId);
-          } else if (evt.related && evt.related.classList.contains('col')) {
-            // FALLBACK: Si no pudimos detectar ID por coordenadas, usamos evt.related
-            // Esto es vital si TargetIdDesdePunto falla
-            evt.related.classList.add("cw-target-invalid");
+          } else {
+            ClearHoverTarget();
           }
-
           return false;
         }
 
