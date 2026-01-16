@@ -15,55 +15,15 @@
 </head>
 
 <body class="bg-lines">
-    <!-- Floating game status notification -->
-    <div id="game-notification" class="game-notification">
-        <p id="message"></p>
-        <button id="replay" style="display:none;">Jugar de nuevo</button>
-    </div>
-
     <div class="container vh-100">
         <div class="row align-items-start justify-content-center vh-100 text-center">
-
-            <!-- RULETA CENTRADA -->
-            <div class="col-10 col-md-7 col-lg-5 col-xl-4 mt-4" hidden>
-                <p class="mb-5 font12 gray-600">Al girar la ruleta te seleccionará<br>
-                    una pregunta aleatoria para que respondas.</p>
-            
-                    <div class="wheel-container">
-                        <!-- Luz de ganador -->
-                        <div class="winner-highlight"></div>
-
-                        <!-- Ruleta -->
-                        <div class="wheel">
-                            <!-- data-angle define la posición inicial de cada número (0, 45, 90...) -->
-                            <div class="number" data-angle="0">1</div>
-                            <div class="number" data-angle="45">2</div>
-                            <div class="number" data-angle="90">3</div>
-                            <div class="number" data-angle="135">4</div>
-                            <div class="number" data-angle="180">5</div>
-                            <div class="number" data-angle="225">6</div>
-                            <div class="number" data-angle="270">7</div>
-                            <div class="number" data-angle="315">8</div>
-                        </div>
-
-                        <!-- Botón central -->
-                        <div class="center-circle" onclick="startSpin()">
-                            <img src="img/arrow-ruleta.svg">
-                        </div>
-                    </div>
-               
-            </div>
-
-            <!-- RULETA CON RADIO BUTTONS -->
 
             <div class="col-xl-10 text-center mt-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="text-center bg-gray-200 fit-content px-3 py-1 rounded-2">
-                    <p class="gray-600 mb-0 font11">Preg.</p>
-                    <p class="text-black fw-700 font14 mb-0">1/4</p>
+                        <p class="gray-600 mb-0 font11">Preg.</p>
+                        <p class="text-black fw-700 font14 mb-0" id="round-counter">1/4</p>
                     </div>
-
-
 
                     <div class="timer">
                         <svg class="progress-ring" width="100" height="100">
@@ -76,216 +36,94 @@
                             <span class="time" id="time">01:00</span>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="row align-items-center justify-content-center mt-4">
                     <div class="col-12 col-md position-relative">
-
-                       <div class="wheel-container">
-                        <!-- Luz de ganador -->
-                        <div class="winner-highlight"></div>
-
-                        <!-- Ruleta -->
-                        <div class="wheel">
-                            <!-- data-angle define la posición inicial de cada número (0, 45, 90...) -->
-                            <div class="number" data-angle="0"><!--1--> <img src="img/check.svg" height="13"></div>
-                            <div class="number" data-angle="45">2</div>
-                            <div class="number" data-angle="90">3</div>
-                            <div class="number" data-angle="135"><!--4--><img src="img/wrong.svg" height="13"></div>
-                            <div class="number" data-angle="180">5</div>
-                            <div class="number" data-angle="225">6</div>
-                            <div class="number" data-angle="270">7</div>
-                            <div class="number" data-angle="315">8</div>
-                        </div>
-
-                        <!-- Botón central -->
-                        <div class="center-circle" onclick="startSpin()">
-                            <img src="img/arrow-ruleta.svg">
+                        <div class="wheel-container">
+                            <div class="winner-highlight"></div>
+                            <div class="wheel" id="main-wheel">
+                                <div class="number" data-angle="0">1</div>
+                                <div class="number" data-angle="45">2</div>
+                                <div class="number" data-angle="90">3</div>
+                                <div class="number" data-angle="135">4</div>
+                                <div class="number" data-angle="180">5</div>
+                                <div class="number" data-angle="225">6</div>
+                                <div class="number" data-angle="270">7</div>
+                                <div class="number" data-angle="315">8</div>
+                            </div>
+                            <div class="center-circle" id="spin-btn">
+                                <img src="img/arrow-ruleta.svg">
+                            </div>
                         </div>
                     </div>
 
-
-                    </div>
-
-                    <div class="col-12 col-md text-start">
-
-                        <h3 class="fw-600 text-black mb-4">¿Cuál de estas es una señal de alerta de phishing?</h3>
-
-                        <div class="form-check bg-white border py-3 w-100 rounded-3 mb-3">
-                        <p class="font14 mb-0">Correo de un contacto conocido</p>
+                    <div class="col-12 col-md text-start" id="question-area"
+                        style="opacity: 0.5; pointer-events: none;">
+                        <h3 class="fw-600 text-black mb-4" id="question-text">Gira la ruleta para comenzar</h3>
+                        <div id="options-container">
+                            <!-- Options injected here -->
                         </div>
-
-                        <div class="form-check bg-white active border py-3 w-100 rounded-3 mb-3">
-                        <p class="font14 mb-0">Correo de un contacto conocido</p>
-                        </div>
-
-                        <div class="form-check bg-white border py-3 w-100 rounded-3 mb-3">
-                        <p class="font14 mb-0">Correo de un contacto conocido</p>
-                        </div>
-
-                        <button class="btn btn-siguiente fw-500 mt-4 fit-content px-4 rounded-2 py-2">SIGUIENTE</button>
-
-
+                        <button class="btn btn-siguiente fw-500 mt-4 fit-content px-4 rounded-2 py-2" id="submit-answer"
+                            disabled>RESPONDER</button>
                     </div>
                 </div>
-
-
-
-
             </div>
         </div>
     </div>
 
-
-
-
-
-    <!-- Modal -->
-    <div class="modal fade" id="timeout" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- Modal Feedback Incorrecto -->
+    <div class="modal fade" id="timeout" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 rounded-4">
-
                 <div class="modal-body text-center">
-                    <div class="bg-red-200 fit-content mx-auto p-2 rounded-3 mt-4">
-                        <img src="img/sad.svg" height="32">
+                    <div class="bg-red-200 fit-content mx-auto wh-45 rounded-3 mt-4">
+                        <img src="img/cruz.svg" height="20">
                     </div>
-                    <h4 class="fw-700 mb-0 mt-3">LAMENTABLEMENTE</h4>
-                    <p class="font12 text-red-700">Se te terminó el tiempo</p>
-
-                    <p class="text-black mb-0">Restaste en total 80 puntos</p>
-                    <p class="font10 text-grey-500 mb-0">Respondiste 5 de 8</p>
+                    <h4 class="fw-700 mt-3">Casi... Respuesta Incorrecta</h4>
+                    <p class="font14 mt-3 border-bottom pb-3 modal-question-desc"></p>
+                    <div
+                        class="d-flex align-items-center bg-red-100 fit-content justify-content-center px-2 py-2 rounded-3 mb-2 mx-auto">
+                        <img src="img/explicacion.svg" class="me-2">
+                        <p class="mb-0 fw-600 font10 text-red-700 lh-sm">Explicación</p>
+                    </div>
+                    <p class="text-black mb-0 font12 modal-explanation"></p>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-primary font11 px-3 fw-500">Volver a la Misión</button>
+                    <button type="button"
+                        class="font11 border-0 bg-white fw-600 text-primary btn-modal-continue">Continuar</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal Feedback Correcto -->
+    <div class="modal fade" id="correct" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-body text-center">
+                    <div class="bg-green-200 fit-content mx-auto wh-45 rounded-3 mt-4">
+                        <img src="img/tilde.svg" height="15">
+                    </div>
+                    <h4 class="fw-700 mt-3">¡Respuesta Correcta!</h4>
+                    <p class="font14 mt-3 border-bottom pb-3 modal-question-desc"></p>
+                    <div
+                        class="d-flex align-items-center bg-green-100 fit-content justify-content-center px-2 py-2 rounded-3 mb-2 mx-auto">
+                        <img src="img/explicacion-ok.svg" class="me-2">
+                        <p class="mb-0 fw-600 font10 text-green-700 lh-sm">Tip de Seguridad</p>
+                    </div>
+                    <p class="text-black mb-0 font12 modal-explanation"></p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button"
+                        class="font11 border-0 bg-white fw-600 text-primary btn-modal-continue">Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
-    <script>
-        const DISTANCE = 155; 
-
-        document.querySelectorAll('.wheel-container').forEach(setupRoulette);
-
-        function setupRoulette(container) {
-            const wheel = container.querySelector('.wheel');
-            const numbers = container.querySelectorAll('.number');
-            const highlight = container.querySelector('.winner-highlight');
-            const btn = container.querySelector('.center-circle');
-
-            let currentRotation = 0;
-            let targetRotation = 0;
-            let isSpinning = false;
-
-            // --- 1. COLORES BASE (Normales) ---
-            const originalColors = [
-                '#739CFF', // 1
-                '#84BBBF', // 2
-                '#90D67F', // 3
-                '#C7D182', // 4
-                '#FFCC85', // 5
-                '#E1B4C2', // 6
-                '#C29CFF', // 7
-                '#9E9FFF'  // 8
-            ];
-            
-            // --- 2. COLORES ACTIVOS (Cuando ganan) ---
-            // Define aquí el color especial para cada número (deben coincidir en orden)
-            const activeColors = [
-                '#3874FF', // 1 - Azul intenso
-                '#2F9281', // 2 - Verde azulado oscuro
-                '#25B003', // 3 - Verde fuerte
-                '#87A620', // 4 - Oliva fuerte
-                '#EA9C3C', // 5 - Naranja fuerte
-                '#C78699', // 6 - Rosa fuerte
-                '#A370F7', // 7 - Violeta fuerte
-                '#6E72FB'  // 8 - Índigo fuerte
-            ];
-
-            let currentColors = [...originalColors];
-
-            // Inicializar
-            drawWheelGradient(); 
-            updatePositions();
-
-            btn.addEventListener('click', startSpin);
-
-            function drawWheelGradient() {
-                let gradientString = 'conic-gradient(from -22.5deg, ';
-                currentColors.forEach((color, index) => {
-                    const startDeg = index * 45;
-                    const endDeg = (index + 1) * 45;
-                    gradientString += `${color} ${startDeg}deg ${endDeg}deg`;
-                    if (index < currentColors.length - 1) gradientString += ', ';
-                });
-                gradientString += ')';
-                wheel.style.background = gradientString;
-            }
-
-            function startSpin() {
-                if (isSpinning) return;
-                isSpinning = true;
-                highlight.classList.remove('active');
-
-                // Restaurar colores originales
-                currentColors = [...originalColors];
-                drawWheelGradient();
-
-                const randomWedges = Math.floor(20 + Math.random() * 20); 
-                const extraDegrees = randomWedges * 45;
-                targetRotation = currentRotation + extraDegrees;
-
-                animateWheel();
-            }
-
-            function animateWheel() {
-                const speed = 0.05;
-                const diff = targetRotation - currentRotation;
-
-                if (diff < 0.5) {
-                    currentRotation = targetRotation;
-                    updatePositions();
-                    finishSpin();
-                    return;
-                }
-                currentRotation += diff * speed;
-                updatePositions();
-                requestAnimationFrame(animateWheel);
-            }
-
-            function updatePositions() {
-                wheel.style.transform = `rotate(-${currentRotation}deg)`;
-                numbers.forEach(num => {
-                    const startAngle = parseFloat(num.getAttribute('data-angle'));
-                    num.style.transform = `
-                        rotate(${startAngle}deg) 
-                        translate(${DISTANCE}px) 
-                        rotate(${-startAngle + currentRotation}deg)
-                    `;
-                });
-            }
-
-            function finishSpin() {
-                isSpinning = false;
-                highlight.classList.add('active');
-
-                const totalDegrees = currentRotation % 360;
-                const wedgeIndex = Math.round(totalDegrees / 45);
-                const winnerIndex = wedgeIndex % 8;
-
-                // --- AQUÍ ESTÁ EL CAMBIO ---
-                // En lugar de poner un color fijo ('#FFF'), usamos el array de colores activos
-                currentColors[winnerIndex] = activeColors[winnerIndex]; 
-                
-                drawWheelGradient();
-            }
-        }
-    </script>
-
-
-
     <script src="js/game.js"></script>
 </body>
 

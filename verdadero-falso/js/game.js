@@ -22,6 +22,9 @@ const feedbackMsgs = document.querySelectorAll(".feedback-msg");
 const timeText = document.getElementById("time");
 const circle = document.querySelector(".progress-ring__circle");
 
+let modalCorrect = null;
+let modalTimeout = null;
+
 // Timer settings
 const radius = 42;
 const circumference = 2 * Math.PI * radius;
@@ -127,10 +130,6 @@ function RenderScreen() {
 
   // Set Text
   if (questionTextEl) questionTextEl.textContent = inst.question || "Pregunta...";
-  // If description exists use it, if not maybe hide it? 
-  if (questionDescEl) {
-    questionDescEl.textContent = inst.text || "";
-  }
 }
 
 async function HandleAnswer(isTrue) {
@@ -162,45 +161,20 @@ async function HandleAnswer(isTrue) {
     });
     const data = await response.json();
 
-    // Show Feedback
-    // The original design has <p class="feedback-msg">CORRECTO!</p> inside each col.
-    // We can show the one corresponding to the selected button? 
-    // Or show the one under the user's choice?
-    // Let's assume we show the feedback message under the USER'S choice if correct?
-    // Wait, the HTML has "CORRECTO!" hardcoded.
+    // Show Feedback in Modal
+    const modalId = data.isCorrect ? 'correct' : 'timeout';
+    const modalEl = document.getElementById(modalId);
+    if (modalEl) {
+      const inst = estado.instances[estado.currentIndex];
+      const descEl = modalEl.querySelector(".modal-question-desc");
+      const explEl = modalEl.querySelector(".modal-explanation");
 
-    let msg = "INCORRECTO";
-    if (data.isCorrect) msg = "CORRECTO!";
+      if (descEl) descEl.textContent = inst.text || "";
+      if (explEl) explEl.textContent = data.explanation || "";
 
-    feedbackMsgs.forEach(el => {
-      el.textContent = msg;
-      // set style based on correctness if needed, but class is fixed.
-      // maybe add text-danger for incorrect?
-      if (!data.isCorrect) {
-        el.classList.remove("text-violeta");
-        el.classList.add("text-danger"); // Bootstrap red
-      } else {
-        el.classList.add("text-violeta");
-        el.classList.remove("text-danger");
-      }
-    });
-
-    // Show feedback under the button the user clicked
-    if (isTrue) {
-      btnTrue.parentElement.querySelector(".feedback-msg").style.display = "block";
-    } else {
-      btnFalse.parentElement.querySelector(".feedback-msg").style.display = "block";
+      if (modalId === 'correct' && modalCorrect) modalCorrect.show();
+      else if (modalId === 'timeout' && modalTimeout) modalTimeout.show();
     }
-
-    // Show Explanation
-    const explEl = document.getElementById("answer-explanation");
-    if (explEl && data.explanation) {
-      explEl.textContent = data.explanation;
-      explEl.style.display = "block";
-    }
-
-    // Show next button
-    btnNext.style.visibility = "visible";
 
     estado.score = data.totalScore;
 
@@ -243,5 +217,25 @@ if (btnNext) btnNext.addEventListener("click", () => {
 
 // Start
 document.addEventListener("DOMContentLoaded", () => {
+  // Initialize modals
+  const modalCorrectEl = document.getElementById('correct');
+  const modalTimeoutEl = document.getElementById('timeout');
+
+  if (typeof bootstrap !== 'undefined') {
+    if (modalCorrectEl) modalCorrect = new bootstrap.Modal(modalCorrectEl, { backdrop: 'static', keyboard: false });
+    if (modalTimeoutEl) modalTimeout = new bootstrap.Modal(modalTimeoutEl, { backdrop: 'static', keyboard: false });
+  }
+
+  // Handle continue buttons
+  document.querySelectorAll(".btn-modal-continue").forEach(btn => {
+    btn.onclick = () => {
+      if (modalCorrect) modalCorrect.hide();
+      if (modalTimeout) modalTimeout.hide();
+
+      estado.currentIndex++;
+      RenderScreen();
+    };
+  });
+
   IniciarJuego();
 });

@@ -8,7 +8,8 @@ const estado = {
   pendingAnswer: null, // Stores selected index before submission
   score: 0,
   juegoTerminado: false,
-  videoCompleted: {} // index -> boolean
+  videoCompleted: {}, // index -> boolean
+  maxIndexReached: 0
 };
 
 // DOM Elements
@@ -87,6 +88,16 @@ function RenderSlider() {
     p.textContent = `${idx + 1}. ${inst.step_title || 'Info'}`;
 
     card.appendChild(p);
+
+    // Click handler for backward/visited navigation
+    card.onclick = () => {
+      if (idx <= estado.maxIndexReached) {
+        IrASeccion(idx);
+      } else {
+        dbg("SECTION_LOCKED", { index: idx });
+      }
+    };
+
     stepsSliderContainer.appendChild(card);
   });
 
@@ -411,9 +422,13 @@ function UpdateSliderClasses() {
     }
 
     card.classList.remove("active", "success", "locked");
-    if (idx === estado.currentIndex) card.classList.add("active");
-    else if (idx < estado.currentIndex) card.classList.add("success");
-    else card.classList.add("locked");
+    if (idx === estado.currentIndex) {
+      card.classList.add("active");
+    } else if (idx <= estado.maxIndexReached) {
+      card.classList.add("success");
+    } else {
+      card.classList.add("locked");
+    }
 
 
   });
@@ -472,24 +487,29 @@ btnNext.onclick = async () => {
   }
 
   if (estado.currentIndex < estado.instances.length - 1) {
-    // Reiniciar y pausar el video al cambiar de sección
-    ResetAndPauseVideo();
-
-    estado.currentIndex++;
-    estado.pendingAnswer = null; // Clear any stale pending
-    RenderScreen();
+    IrASeccion(estado.currentIndex + 1);
   }
 };
 
 btnPrev.onclick = () => {
   if (estado.currentIndex > 0) {
-    // Reiniciar y pausar el video al cambiar de sección
-    ResetAndPauseVideo();
-
-    estado.currentIndex--;
-    RenderScreen();
+    IrASeccion(estado.currentIndex - 1);
   }
 };
+
+function IrASeccion(idx) {
+  dbg("CAMBIANDO_SECCION", { from: estado.currentIndex, to: idx });
+
+  // Reiniciar y pausar el video al cambiar de sección
+  ResetAndPauseVideo();
+
+  estado.currentIndex = idx;
+  if (idx > estado.maxIndexReached) {
+    estado.maxIndexReached = idx;
+  }
+  estado.pendingAnswer = null; // Clear any stale pending
+  RenderScreen();
+}
 
 btnFinish.onclick = (e) => {
   e.preventDefault();
