@@ -25,10 +25,6 @@ p {
     align-items: center;
 }
 
-.steps-slider .slick-list {
-    overflow: visible;
-}
-
 .background-img {
     min-height: 370px;
     background-repeat: no-repeat;
@@ -520,9 +516,9 @@ h2 {
 
 @media (max-width: 1400px) {
 
-    .cards-ob .card p {
-        font-size: 15px;
-    }
+ .card-body.p-4 {
+    padding: 8% !important;
+}
 }
 
 /* ERROR FLASH ANIMATION */
