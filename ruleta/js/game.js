@@ -19,7 +19,8 @@ const estado = {
   selectedOption: null,
   playedIndices: [],
   results: {},
-  focusIndex: null
+  focusIndex: null,
+  finalizando: false
 };
 
 const DISTANCE = 155;
@@ -83,24 +84,25 @@ function AngleDegFromVector(dx, dy) {
   return NormalizeDeg(rad * 180 / Math.PI);
 }
 
-function EnableEl(el) {
+function ForcePrimaryEnabled(el) {
   if (!el) return;
+  el.classList.add('btn-primary');
+  el.classList.remove('btn-secondary', 'btn-light', 'btn-outline-primary', 'btn-outline-secondary', 'opacity-50', 'pe-none', 'disabled');
+  el.removeAttribute('aria-disabled');
   el.disabled = false;
   el.removeAttribute('disabled');
-  el.classList.remove('disabled');
-  el.removeAttribute('aria-disabled');
   el.style.pointerEvents = 'auto';
   el.style.opacity = '1';
+  el.style.filter = 'none';
 }
 
-function DisableEl(el) {
+function ForceDisabled(el) {
   if (!el) return;
-  el.disabled = true;
-  el.setAttribute('disabled', 'disabled');
   el.classList.add('disabled');
   el.setAttribute('aria-disabled', 'true');
+  el.disabled = true;
+  el.setAttribute('disabled', 'disabled');
   el.style.pointerEvents = 'none';
-  el.style.opacity = '';
 }
 
 function SetSubmitMode(mode) {
@@ -108,20 +110,20 @@ function SetSubmitMode(mode) {
 
   if (mode === 'spin') {
     submitBtn.textContent = "GIRAR LA RULETA";
-    EnableEl(submitBtn);
+    ForcePrimaryEnabled(submitBtn);
     return;
   }
 
   if (mode === 'spinning') {
     submitBtn.textContent = "GIRANDO...";
-    DisableEl(submitBtn);
+    ForceDisabled(submitBtn);
     return;
   }
 
   if (mode === 'answer') {
     submitBtn.textContent = "RESPONDER";
-    if (estado.selectedOption === null) DisableEl(submitBtn);
-    else EnableEl(submitBtn);
+    if (estado.selectedOption === null) ForceDisabled(submitBtn);
+    else ForcePrimaryEnabled(submitBtn);
     return;
   }
 }
@@ -280,9 +282,7 @@ function CalibrateSegmentAngles() {
 }
 
 function DesiredRotationForIndex(targetIndex) {
-  if (!segmentBaseAngles || segmentBaseAngles.length !== 8) {
-    return NormalizeDeg(targetIndex * 45);
-  }
+  if (!segmentBaseAngles || segmentBaseAngles.length !== 8) return NormalizeDeg(targetIndex * 45);
   const baseAngle = segmentBaseAngles[targetIndex];
   return NormalizeDeg(baseAngle - POINTER_ANGLE_DEG);
 }
@@ -291,60 +291,73 @@ function CanSpin() {
   return !estado.isSpinning && !estado.juegoTerminado && estado.currentRound < estado.roundsToPlay && estado.currentSpinningIndex === null;
 }
 
-function RequestSpin() {
+function RequestSpin(tryNum = 0) {
   if (!CanSpin()) return;
 
   SetSubmitMode('spinning');
 
   $.post("ajax/action.php", { op: "spin", gid: estado.gid }, (data) => {
-    if (data && data.success) {
-      StartWheelAnimation(data.chosen_index);
-    } else {
+    if (!data || !data.success) {
       SetSubmitMode('spin');
+      return;
     }
+
+    const idx = data.chosen_index;
+
+    if (estado.results[idx]) {
+      if (tryNum < 5) {
+        RequestSpin(tryNum + 1);
+        return;
+      }
+      SetSubmitMode('spin');
+      return;
+    }
+
+    StartWheelAnimation(idx);
   });
 }
 
 function IniciarJuego() {
   $.post("ajax/game-start.php", { cfg_key: "ruleta" }, (data) => {
-    if (data && data.success) {
-      estado.gid = data.gid;
-      estado.instances = data.instances;
-      estado.tiempoRestante = data.duration;
-      estado.initialDuration = data.duration;
-      estado.roundsToPlay = data.rounds_to_play;
+    if (!data || !data.success) return;
 
-      estado.currentRound = 0;
-      estado.score = 0;
-      estado.juegoTerminado = false;
-      estado.playedIndices = [];
-      estado.results = {};
-      estado.currentRotation = 0;
-      estado.targetRotation = 0;
-      estado.currentSpinningIndex = null;
-      estado.selectedOption = null;
-      estado.isSpinning = false;
-      estado.focusIndex = null;
+    estado.gid = data.gid;
+    estado.instances = data.instances;
+    estado.tiempoRestante = data.duration;
+    estado.initialDuration = data.duration;
+    estado.roundsToPlay = data.rounds_to_play;
 
-      UpdateUI();
-      IniciarTimer();
-      UpdateWheelVisuals();
+    estado.currentRound = 0;
+    estado.score = 0;
+    estado.juegoTerminado = false;
+    estado.playedIndices = [];
+    estado.results = {};
+    estado.currentRotation = 0;
+    estado.targetRotation = 0;
+    estado.currentSpinningIndex = null;
+    estado.selectedOption = null;
+    estado.isSpinning = false;
+    estado.focusIndex = null;
+    estado.finalizando = false;
 
+    UpdateUI();
+    IniciarTimer();
+    UpdateWheelVisuals();
+
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          CalibrateSegmentAngles();
-        });
+        CalibrateSegmentAngles();
       });
+    });
 
-      SetSubmitMode('spin');
+    SetSubmitMode('spin');
 
-      if (questionArea) {
-        questionArea.style.opacity = "0.5";
-        questionArea.style.pointerEvents = "none";
-      }
-      if (questionText) questionText.textContent = "Gira la ruleta para comenzar";
-      if (optionsContainer) optionsContainer.innerHTML = "";
+    if (questionArea) {
+      questionArea.style.opacity = "0.5";
+      questionArea.style.pointerEvents = "none";
     }
+    if (questionText) questionText.textContent = "Gira la ruleta para comenzar";
+    if (optionsContainer) optionsContainer.innerHTML = "";
   });
 }
 
@@ -386,7 +399,8 @@ function ActualizarTiempo() {
 }
 
 if (spinBtn) {
-  spinBtn.addEventListener("click", () => {
+  spinBtn.addEventListener("click", (e) => {
+    e.preventDefault();
     RequestSpin();
   });
 }
@@ -481,7 +495,7 @@ if (submitBtn) {
 
     if (estado.selectedOption === null) return;
 
-    DisableEl(submitBtn);
+    ForceDisabled(submitBtn);
 
     $.post("ajax/action.php", {
       op: "check_answer",
@@ -556,10 +570,23 @@ function UpdateUI() {
 }
 
 function FinalizarJuego() {
+  if (estado.finalizando) return;
+  estado.finalizando = true;
+
   estado.juegoTerminado = true;
   if (estado.animationFrameId) cancelAnimationFrame(estado.animationFrameId);
 
-  $.post("ajax/game-over.php", { gid: estado.gid }, () => {
+  ForceDisabled(submitBtn);
+  ForceDisabled(spinBtn);
+
+  $.post("ajax/game-over.php", { gid: estado.gid }, (data) => {
+    const correct = data && typeof data.correct_count === 'number' ? data.correct_count : 0;
+    const total = data && typeof data.total_count === 'number' ? data.total_count : estado.currentRound;
+    const timeSpent = data && typeof data.time_spent === 'number' ? data.time_spent : Math.max(0, Math.round(estado.initialDuration - estado.tiempoRestante));
+
+    const msg = `¡Juego terminado!\n\nRespondiste bien ${correct} de ${total} preguntas.\nTiempo total: ${timeSpent} segundos.`;
+    alert(msg);
+
     window.location.href = "index.html";
   });
 }
