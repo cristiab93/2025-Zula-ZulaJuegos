@@ -256,6 +256,27 @@ body {
     position: relative;
 }
 
+.modal h4
+ {
+    font-size: 18px;
+}
+
+.text-green-700 {
+    color: #1C6C09;
+}
+
+.bg-green-200 {
+    background-color: #BEE8B4;
+}
+
+.bg-red-200 {
+    background-color: #FABCB3;
+}
+
+.text-red-700 {
+    color: #B81800;
+}
+
 .circle {
     width: 90px;
     height: 90px;
@@ -582,10 +603,3 @@ body {
     }
 }
 
-
-@media (max-width: 1400px) {
-
-    .cards-ob .card p {
-        font-size: 15px;
-    }
-}

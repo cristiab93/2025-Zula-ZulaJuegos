@@ -126,8 +126,17 @@ body {
     background-color: #D9FBD0;
 }
 
+.text-green-700 {
+    color: #1C6C09;
+}
+
 .bg-blue-100 {
     background-color: #E5EDFF;
+}
+
+.modal h4
+ {
+    font-size: 18px;
 }
 
 .bg-red-100 {
@@ -136,6 +145,10 @@ body {
 
 .bg-red-200 {
     background-color: #FABCB3;
+}
+
+.bg-green-200 {
+    background-color: #BEE8B4;
 }
 
 .text-red-700 {
@@ -642,10 +655,3 @@ body {
     }
 }
 
-
-@media (max-width: 1400px) {
-
-    .cards-ob .card p {
-        font-size: 15px;
-    }
-}

@@ -203,7 +203,7 @@ function RenderQuestion(index) {
   inst.options.forEach((opt, i) => {
     const div = document.createElement("div");
     div.className = "form-check bg-white border py-3 w-100 rounded-3 mb-3 cursor-pointer option-item";
-    div.innerHTML = `<p class="font14 mb-0 ms-3">${opt}</p>`;
+    div.innerHTML = `<p class="font14 mb-0">${opt}</p>`;
     div.addEventListener("click", () => {
       document.querySelectorAll('.option-item').forEach(el => el.classList.remove('active'));
       div.classList.add('active');
