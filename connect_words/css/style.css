@@ -540,7 +540,8 @@ body {
 
 @media (max-width: 1400px) {
 
-    .cards-ob .card p {
-        font-size: 15px;
+        .card-body.p-4
+ {
+        padding: 8% !important;
     }
 }

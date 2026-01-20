@@ -252,6 +252,38 @@ h2 {
     line-height: 45px;
 }
 
+.slick-slider::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;                 /* ancho del fade */
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0),
+    rgba(255,255,255,1)
+  );
+}
+
+.slick-slider::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  z-index: 9;
+  left: 0;
+  width: 40px;                 /* ancho del fade */
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    to left,
+    rgba(255,255,255,0),
+    rgba(255,255,255,1)
+  );
+}
+
+
 .wh-65 {
     width: 65px;
     height: 65px;
@@ -519,6 +551,22 @@ h2 {
  .card-body.p-4 {
     padding: 8% !important;
 }
+
+.wh-45
+ {
+    min-width: 42px;
+    min-height: 42px;
+    line-height: 41px;
+}
+
+.card-body .wh-45 img {
+    height: 24px;
+}
+
+.cards-ob .card {
+    min-height: 97px;
+}
+
 }
 
 /* ERROR FLASH ANIMATION */
