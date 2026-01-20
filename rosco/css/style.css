@@ -590,3 +590,15 @@ body {
         opacity: 1;
     }
 }
+
+
+@media (max-width: 1400px) {
+
+.circle-wrapper {
+    width: 380px;
+    height: 380px;
+}
+h3 {
+    font-size: 24px;
+}
+}
