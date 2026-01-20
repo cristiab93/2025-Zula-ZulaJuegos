@@ -71,7 +71,7 @@ function RenderRosco() {
 
         // Dynamic radial position
         div.style.position = "absolute";
-        div.style.top = "40%";
+        div.style.top = "45%";
         div.style.left = "50%";
         div.style.transformOrigin = "center";
         div.style.transform = `rotate(${angle}deg) translate(${RADIUS}px) rotate(${-angle}deg)`;
