@@ -23,7 +23,7 @@
     <div class="row align-items-start justify-content-center vh-100">
       <div class="col-xl-10 text-center mt-4">
         <div class="d-flex justify-content-end align-items-center mb-4">
-        <!--  <div class="text-start">
+          <!--  <div class="text-start">
             <div class="bg-gray-200 fit-content px-2 py-1 rounded-2">
               <img src="img/alert.svg" height="17">
             </div>
@@ -63,8 +63,8 @@
 
             <h3 class="text-black fw-600 mt-3" id="question-text">El CBU identifica de forma única una cuenta bancaria
               en Argentina.</h3>
-            <button class="btn btn-siguiente fw-600 mt-4 fit-content px-4 rounded-2 py-2 d-none"
-              id="btn-next">SIGUIENTE</button>
+            <button class="btn btn-siguiente fw-600 mt-4 fit-content px-4 rounded-2 py-2 d-none" id="btn-next">Validar
+              respuesta</button>
 
 
           </div>
@@ -72,7 +72,7 @@
           <div class="col-12 col-md-6 text-start cards-vf">
             <div class="row align-items-start">
               <div class="col-6">
-                <div class="h-100 bg-white verdadero active border rounded-3 text-center" id="btn-true">
+                <div class="h-100 bg-white verdadero border rounded-3 text-center" id="btn-true">
                   <div class="bg-green card-v rounded-3 m-3 d-flex align-items-center justify-content-center">
                     <h4 class="mb-0 text-white fw-600">V</h4>
                   </div>
@@ -125,58 +125,62 @@
 
       </div>
     </div>
-  <div class="modal fade" id="timeout" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 rounded-4">
+    <div class="modal fade" id="timeout" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
 
-        <div class="modal-body text-center">
-          <div class="bg-red-200 fit-content mx-auto wh-45 rounded-3 mt-4">
-            <img src="img/cruz.svg" height="20">
+          <div class="modal-body text-center">
+            <div class="bg-red-200 fit-content mx-auto wh-45 rounded-3 mt-4">
+              <img src="img/cruz.svg" height="20">
+            </div>
+            <h4 class="fw-700 mt-3">Casi... Respuesta Incorrecta</h4>
+            <p class="font14 mt-3 border-bottom pb-3 modal-question-desc">No sumaste puntos</p>
+            <div
+              class="d-flex align-items-center bg-red-100 fit-content justify-content-center px-2 py-2 rounded-3 mb-2 mx-auto">
+              <img src="img/explicacion.svg" class="me-2">
+              <p class="mb-0 fw-600 font10 text-red-700 lh-sm">Explicación</p>
+            </div>
+            <p class="text-black mb-0 font12 modal-explanation"></p>
           </div>
-          <h4 class="fw-700 mt-3">Casi... Respuesta Incorrecta</h4>
-          <p class="font14 mt-3 border-bottom pb-3 modal-question-desc">No sumaste puntos</p>
-          <div class="d-flex align-items-center bg-red-100 fit-content justify-content-center px-2 py-2 rounded-3 mb-2 mx-auto">
-            <img src="img/explicacion.svg" class="me-2">
-            <p class="mb-0 fw-600 font10 text-red-700 lh-sm">Explicación</p>
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="font11 border-0 bg-white fw-600 text-primary btn-modal-continue">Continuar con
+              otra</button>
           </div>
-          <p class="text-black mb-0 font12 modal-explanation"></p>
-        </div>
-        <div class="modal-footer justify-content-center">
-          <button type="button" class="font11 border-0 bg-white fw-600 text-primary btn-modal-continue">Continuar con otra</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="correct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 rounded-4">
-
-        <div class="modal-body text-center">
-          <div class="bg-green-200 fit-content mx-auto wh-45 rounded-3 mt-4">
-            <img src="img/tilde.svg" height="15">
-          </div>
-          <h4 class="fw-700 mt-3">¡Respuesta Correcta!</h4>
-          <p class="font14 mt-3 border-bottom pb-3 modal-question-desc">Sumaste 10 puntos</p>
-          <div class="d-flex align-items-center bg-green-100 fit-content justify-content-center px-2 py-2 rounded-3 mb-2 mx-auto">
-            <img src="img/explicacion-ok.svg" class="me-2">
-            <p class="mb-0 fw-600 font10 text-green-700 lh-sm">Tip de Seguridad</p>
-          </div>
-          <p class="text-black mb-0 font12 modal-explanation"></p>
-        </div>
-        <div class="modal-footer justify-content-center">
-          <button type="button" class="font11 border-0 bg-white fw-600 text-primary btn-modal-continue">Continuar con otra</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Scripts: bootstrap + Sortable (igual que tenías) -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="js/bootstrap.bundle.min.js"></script>
+    <div class="modal fade" id="correct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
 
-  <!-- Removed Inline Script to manage it from game.js -->
-  <script src="js/game.js"></script>
+          <div class="modal-body text-center">
+            <div class="bg-green-200 fit-content mx-auto wh-45 rounded-3 mt-4">
+              <img src="img/tilde.svg" height="15">
+            </div>
+            <h4 class="fw-700 mt-3">¡Respuesta Correcta!</h4>
+            <p class="font14 mt-3 border-bottom pb-3 modal-question-desc">Sumaste 10 puntos</p>
+            <div
+              class="d-flex align-items-center bg-green-100 fit-content justify-content-center px-2 py-2 rounded-3 mb-2 mx-auto">
+              <img src="img/explicacion-ok.svg" class="me-2">
+              <p class="mb-0 fw-600 font10 text-green-700 lh-sm">Tip de Seguridad</p>
+            </div>
+            <p class="text-black mb-0 font12 modal-explanation"></p>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="font11 border-0 bg-white fw-600 text-primary btn-modal-continue">Continuar con
+              otra</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts: bootstrap + Sortable (igual que tenías) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+
+    <!-- Removed Inline Script to manage it from game.js -->
+    <script src="js/game.js"></script>
 </body>
 
 </html>

@@ -256,8 +256,7 @@ body {
     position: relative;
 }
 
-.modal h4
- {
+.modal h4 {
     font-size: 18px;
 }
 
@@ -603,3 +602,14 @@ body {
     }
 }
 
+.cards-vf .verdadero,
+.cards-vf .falso {
+    transition: all 0.2s ease;
+}
+
+.cards-vf .verdadero.selected-card,
+.cards-vf .falso.selected-card {
+    box-shadow: 0 0 0 6px rgba(102, 16, 242, 0.35);
+    transform: scale(1.03);
+    border-color: #6610F2 !important;
+}

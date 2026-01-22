@@ -237,9 +237,7 @@ function SetHoverTarget(id) {
     ClearHoverTarget();
     return;
   }
-  // Check if we already have this target as valid
-  const currentIsInvalid = document.querySelector(".cw-target-invalid[data-tile-id='" + v + "']");
-  if (estado.lastTargetId && String(estado.lastTargetId) === v && !currentIsInvalid) return;
+
 
   ClearHoverTarget();
   const el = TileElById(v);
@@ -254,9 +252,7 @@ function SetInvalidTarget(id) {
     ClearHoverTarget();
     return;
   }
-  // Check if we already have this target as invalid
-  const currentInv = document.querySelector(".cw-target-invalid[data-tile-id='" + v + "']");
-  if (estado.lastTargetId && String(estado.lastTargetId) === v && currentInv) return;
+
 
   ClearHoverTarget();
   const el = TileElById(v);
@@ -858,7 +854,10 @@ function Renderizar() {
       onMove: evt => {
         // [MOD] Validacion de movimiento horizontal (misma fila)
         // [MOD] Validacion de movimiento horizontal (misma fila)
-        if (evt.from === evt.to) {
+        const fromRow = evt.from ? evt.from.dataset.rowIndex : null;
+        const toRow = evt.to ? evt.to.dataset.rowIndex : null;
+
+        if (evt.from === evt.to || (fromRow !== null && fromRow === toRow)) {
           // [DEBUG] Horizontal move detected
           const coords = CoordsFromSortableEvent(evt);
           let targetId = null;

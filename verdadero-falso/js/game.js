@@ -9,7 +9,8 @@ const estado = {
   timerInterval: null,
   duration: 60,
   timeLeft: 60,
-  hasAnswered: false
+  hasAnswered: false,
+  selectedOption: null
 };
 
 // DOM Elements
@@ -114,10 +115,11 @@ function RenderScreen() {
 
 
   estado.hasAnswered = false;
+  estado.selectedOption = null;
 
   // Reset UI
-  btnTrue.classList.remove("active", "disabled");
-  btnFalse.classList.remove("active", "disabled");
+  btnTrue.classList.remove("active", "disabled", "selected-card");
+  btnFalse.classList.remove("active", "disabled", "selected-card");
   // Make them clickable again
   btnTrue.style.pointerEvents = "auto";
   btnFalse.style.pointerEvents = "auto";
@@ -126,26 +128,42 @@ function RenderScreen() {
   const explEl = document.getElementById("answer-explanation");
   if (explEl) explEl.style.display = "none";
 
-  btnNext.style.visibility = "hidden"; // Or display none
+  btnNext.classList.add("d-none");
+  btnNext.style.visibility = "visible"; // We use d-none instead
 
   // Set Text
   if (questionTextEl) questionTextEl.textContent = inst.question || "Pregunta...";
 }
 
-async function HandleAnswer(isTrue) {
+function SelectOption(isTrue) {
   if (estado.hasAnswered) return;
-  estado.hasAnswered = true;
+
+  estado.selectedOption = isTrue;
 
   // Visual selection
+  btnTrue.classList.remove("selected-card");
+  btnFalse.classList.remove("selected-card");
+
   if (isTrue) {
-    btnTrue.classList.add("active");
+    btnTrue.classList.add("selected-card");
   } else {
-    btnFalse.classList.add("active");
+    btnFalse.classList.add("selected-card");
   }
+
+  // Show Next button
+  btnNext.classList.remove("d-none");
+}
+
+async function HandleAnswer() {
+  if (estado.hasAnswered || estado.selectedOption === null) return;
+  estado.hasAnswered = true;
+
+  const isTrue = estado.selectedOption;
 
   // Disable interactions
   btnTrue.style.pointerEvents = "none";
   btnFalse.style.pointerEvents = "none";
+  btnNext.classList.add("d-none");
 
   try {
     const formData = new URLSearchParams();
@@ -162,21 +180,30 @@ async function HandleAnswer(isTrue) {
     const data = await response.json();
 
     // Show Feedback in Modal
-    const modalId = data.isCorrect ? 'correct' : 'timeout';
-    const modalEl = document.getElementById(modalId);
-    if (modalEl) {
-      const inst = estado.instances[estado.currentIndex];
-      const descEl = modalEl.querySelector(".modal-question-desc");
-      const explEl = modalEl.querySelector(".modal-explanation");
+    if (data.success) {
+      if (data.isCorrect) {
+        if (isTrue) btnTrue.classList.add("active");
+        else btnFalse.classList.add("active");
+      } else {
+        // Option: we could highlight the wrong one or just show the modal
+      }
 
-      if (descEl) descEl.textContent = inst.text || "";
-      if (explEl) explEl.textContent = data.explanation || "";
+      const modalId = data.isCorrect ? 'correct' : 'timeout';
+      const modalEl = document.getElementById(modalId);
+      if (modalEl) {
+        const inst = estado.instances[estado.currentIndex];
+        const descEl = modalEl.querySelector(".modal-question-desc");
+        const explEl = modalEl.querySelector(".modal-explanation");
 
-      if (modalId === 'correct' && modalCorrect) modalCorrect.show();
-      else if (modalId === 'timeout' && modalTimeout) modalTimeout.show();
+        if (descEl) descEl.textContent = inst.question || "";
+        if (explEl) explEl.textContent = data.explanation || "";
+
+        if (modalId === 'correct' && modalCorrect) modalCorrect.show();
+        else if (modalId === 'timeout' && modalTimeout) modalTimeout.show();
+      }
+
+      estado.score = data.totalScore;
     }
-
-    estado.score = data.totalScore;
 
   } catch (e) {
     console.error("Error checking answer:", e);
@@ -207,12 +234,11 @@ async function FinishGame() {
 }
 
 // Event Listeners
-if (btnTrue) btnTrue.addEventListener("click", () => HandleAnswer(true));
-if (btnFalse) btnFalse.addEventListener("click", () => HandleAnswer(false));
+if (btnTrue) btnTrue.addEventListener("click", () => SelectOption(true));
+if (btnFalse) btnFalse.addEventListener("click", () => SelectOption(false));
 
 if (btnNext) btnNext.addEventListener("click", () => {
-  estado.currentIndex++;
-  RenderScreen();
+  HandleAnswer();
 });
 
 // Start
